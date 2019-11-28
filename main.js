@@ -21,7 +21,7 @@ server.get("/api/users", function(req, res) {
 });
 
 //Добавляем пользователя
-server.post("/api/users", function(req, res) {
+server.post("/api/users/registration", function(req, res) {
   users.addUser(req.body, result => {
     utils.sendResultOrCode(result, 400, res);
   });
