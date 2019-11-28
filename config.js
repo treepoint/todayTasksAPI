@@ -18,5 +18,8 @@ module.exports = {
       password: "test",
       database: "test_haveDoneDB"
     })
+  },
+  jwt: {
+    secret: "&@$!changeme!$@&"
   }
 };

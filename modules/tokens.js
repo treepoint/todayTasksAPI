@@ -1,5 +1,4 @@
 const config = require("../config");
-const md5 = require("../node_modules/js-md5");
 
 var connection = config.db.get;
 
@@ -19,18 +18,16 @@ var getTokenById = (tokenId, callback) => {
 };
 
 //Создаем токен
-var createToken = function(req, userID, callback) {
-  let token = md5(req.body.email + Date.now() + config.salt);
-
+var saveToken = function(tokenId, userID, callback) {
   connection.query(
     "insert into tokens VALUES (?, ?, NOW() + INTERVAL 1 DAY)",
-    [token, userID],
+    [tokenId, userID],
     function(error, results, fields) {
       if (error) throw error;
-      callback(token);
+      callback(true);
     }
   );
 };
 
-module.exports.createToken = createToken;
+module.exports.saveToken = saveToken;
 module.exports.getTokenById = getTokenById;

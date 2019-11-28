@@ -1,5 +1,7 @@
 config = require("../config");
 restify = require("restify");
+const rjwt = require("restify-jwt-community");
+const jwt = require("jsonwebtoken");
 
 var startServer = () => {
   //Запускаем сервер
@@ -16,6 +18,11 @@ var startServer = () => {
   server.use(restify.plugins.acceptParser(server.acceptable));
   server.use(restify.plugins.queryParser());
   server.use(restify.plugins.bodyParser());
+  server.use(
+    rjwt(config.jwt).unless({
+      path: ["/api/auth"]
+    })
+  );
 
   return server;
 };

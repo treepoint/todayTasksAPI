@@ -1,7 +1,8 @@
-users = require("./modules/users.js");
-tokens = require("./modules/tokens.js");
-utils = require("./modules/utils.js");
-startServer = require("./modules/startServer.js");
+const users = require("./modules/users.js");
+const tokens = require("./modules/tokens.js");
+const utils = require("./modules/utils.js");
+const jwt = require("jsonwebtoken");
+const startServer = require("./modules/startServer.js");
 
 const server = startServer();
 
@@ -44,23 +45,33 @@ server.del("/api/users/:id", function(req, res) {
  * Методы работы с токенами
  */
 
-//Создаем токен
-server.post("/api/tokens", function(req, res) {
+//Получаем токен по ID
+server.get("/api/tokens/:id", function(req, res) {
+  tokens.getTokenById(req.params.id, token => {
+    utils.sendResultOrCode(token, 404, res);
+  });
+});
+
+//Авторизуемся в самом API
+server.post("/api/auth", function(req, res) {
   users.getUserByEmailPassword(req, user => {
     if (!user) {
       res.send(404);
       res.end();
     } else {
-      tokens.createToken(req, user.id, token => {
-        utils.sendResultOrCode({ token: token, user: user }, 400, res);
+      let token = jwt.sign(
+        { uid: user.id, email: user.email, password: user.password },
+        config.jwt.secret,
+        {
+          expiresIn: "30m"
+        }
+      );
+
+      tokens.saveToken(token, user.id, isTokenCreated => {
+        if (isTokenCreated) {
+          utils.sendResultOrCode({ token: token, user: user }, 400, res);
+        }
       });
     }
-  });
-});
-
-//Получем токен по ID
-server.get("/api/tokens/:id", function(req, res) {
-  tokens.getTokenById(req.params.id, token => {
-    utils.sendResultOrCode(token, 404, res);
   });
 });

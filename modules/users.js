@@ -9,11 +9,8 @@ var getUserByEmailPassword = (req, callback) => {
     [req.body.email, req.body.password],
     function(error, results) {
       if (error) throw error;
-      try {
-        callback(results[0]);
-      } catch {
-        callback(null);
-      }
+
+      callback(results[0]);
     }
   );
 };
