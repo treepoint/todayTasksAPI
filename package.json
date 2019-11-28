@@ -1,0 +1,14 @@
+{
+  "name": "nodejs-restapi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "js-md5": "^0.7.3",
+    "mysql": "^2.17.1",
+    "restify": "^8.4.0"
+  }
+}
