@@ -1,7 +1,6 @@
 const users = require("./modules/users.js");
 const tokens = require("./modules/tokens.js");
 const utils = require("./modules/utils.js");
-const jwt = require("jsonwebtoken");
 const startServer = require("./modules/startServer.js");
 
 const server = startServer();
@@ -52,25 +51,18 @@ server.get("/api/tokens/:id", function(req, res) {
   });
 });
 
-//Авторизуемся в самом API
+//Авторизуемся в API
 server.post("/api/auth", function(req, res) {
+  //Получаем пользователя по присланным данным
   users.getUserByEmailPassword(req, user => {
     if (!user) {
       res.send(404);
       res.end();
     } else {
-      let token = jwt.sign(
-        { uid: user.id, email: user.email, password: user.password },
-        config.jwt.secret,
-        {
-          expiresIn: "30m"
-        }
-      );
-
-      tokens.saveToken(token, user.id, isTokenCreated => {
-        if (isTokenCreated) {
-          utils.sendResultOrCode({ token: token, user: user }, 400, res);
-        }
+      //Если получили — создаем токен
+      tokens.createToken(user, token => {
+        //Если создали — отправим клиенту
+        utils.sendResultOrCode({ token, user }, 400, res);
       });
     }
   });

@@ -20,6 +20,7 @@ module.exports = {
     })
   },
   jwt: {
-    secret: "&@$!changeme!$@&"
+    secret: "&@$!changeme!$@&",
+    expiresIn: "4320m"
   }
 };
