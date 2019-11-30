@@ -7,7 +7,7 @@ var salt = "someCoolSaltMan";
 module.exports = {
   name: "haveDoneAPI",
   hostname: "http://localhost/api/",
-  version: "0.0.1",
+  version: "0.0.2",
   env: process.env.NODE_ENV || "development",
   port: process.env.PORT || 5000,
   db: {

@@ -2,6 +2,7 @@ const users = require("./modules/users.js");
 const tokens = require("./modules/tokens.js");
 const utils = require("./modules/utils.js");
 const startServer = require("./modules/startServer.js");
+const config = require("./config");
 
 const server = startServer();
 
@@ -66,4 +67,9 @@ server.post("/api/auth", function(req, res) {
       });
     }
   });
+});
+
+//Получаем всех пользователей
+server.get("/api/version", function(req, res) {
+  utils.sendResultOrCode(config.version, 404, res);
 });
