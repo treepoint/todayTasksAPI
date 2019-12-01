@@ -46,16 +46,6 @@ var addUser = (user, callback) => {
   });
 };
 
-//Удаляем пользователя по ID
-var deleteUser = (userId, callback) => {
-  connection.query("DELETE FROM `users` WHERE `id`=?", [userId], function(
-    error
-  ) {
-    if (error) throw error;
-    callback("{success}");
-  });
-};
-
 //Обновляем пользователя по ID
 var updateUserById = (userId, user, callback) => {
   connection.query(
@@ -68,9 +58,19 @@ var updateUserById = (userId, user, callback) => {
   );
 };
 
+//Удаляем пользователя по ID
+var deleteUser = (userId, callback) => {
+  connection.query("DELETE FROM `users` WHERE `id`=?", [userId], function(
+    error
+  ) {
+    if (error) throw error;
+    callback("{success}");
+  });
+};
+
 module.exports.getUserByEmailPassword = getUserByEmailPassword;
 module.exports.getUserById = getUserById;
 module.exports.getUsers = getUsers;
 module.exports.addUser = addUser;
-module.exports.deleteUser = deleteUser;
 module.exports.updateUserById = updateUserById;
+module.exports.deleteUser = deleteUser;

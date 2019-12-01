@@ -1,10 +1,58 @@
-const users = require("./modules/users.js");
 const tokens = require("./modules/tokens.js");
+const users = require("./modules/users.js");
+const categories = require("./modules/categories.js");
 const utils = require("./modules/utils.js");
 const startServer = require("./modules/startServer.js");
 const config = require("./config");
 
 const server = startServer();
+
+/*
+ * Служебное
+ */
+
+//Получаем версию API
+server.get("/api/version", function(req, res) {
+  utils.sendResultOrCode(config.version, 404, res);
+});
+
+/*
+ * Токены
+ */
+
+//Авторизуемся в API
+server.post("/api/auth", function(req, res) {
+  //Получаем пользователя по присланным данным
+  users.getUserByEmailPassword(req, user => {
+    if (!user) {
+      res.send(404);
+      res.end();
+    } else {
+      //Если получили — создаем токен
+      tokens.createTokens(user, (token, refreshToken) => {
+        //Если создали — отправим клиенту
+        utils.sendResultOrCode({ token, refreshToken, user }, 400, res);
+      });
+    }
+  });
+});
+
+//Обновляем авторизацию в API
+server.post("/api/reauth", function(req, res) {
+  tokens.refreshTokens(req.body.refreshToken, (token, refreshToken, user) => {
+    //Если создали — отправим клиенту
+    if (token && refreshToken && user) {
+      res.send({ token, refreshToken, user });
+    } else {
+      res.send(404);
+      res.end();
+    }
+  });
+});
+
+/*
+ * Пользователи
+ */
 
 //Получаем одного пользователя по ID
 server.get("/api/users/:id", function(req, res) {
@@ -42,40 +90,40 @@ server.del("/api/users/:id", function(req, res) {
 });
 
 /*
- * Методы работы с токенами
+ * Категории
  */
 
-//Авторизуемся в API
-server.post("/api/auth", function(req, res) {
-  //Получаем пользователя по присланным данным
-  users.getUserByEmailPassword(req, user => {
-    if (!user) {
-      res.send(404);
-      res.end();
-    } else {
-      //Если получили — создаем токен
-      tokens.createTokens(user, (token, refreshToken) => {
-        //Если создали — отправим клиенту
-        utils.sendResultOrCode({ token, refreshToken, user }, 400, res);
-      });
-    }
+//Получаем категорию по ID
+server.get("/api/categories/:id", function(req, res) {
+  categories.getCategoryById(req, req.params.id, category => {
+    utils.sendResultOrCode(category, 404, res);
   });
 });
 
-//Обновляем авторизацию в API
-server.post("/api/reauth", function(req, res) {
-  tokens.refreshTokens(req.body.refreshToken, (token, refreshToken, user) => {
-    //Если создали — отправим клиенту
-    if (token && refreshToken && user) {
-      res.send({ token, refreshToken, user });
-    } else {
-      res.send(404);
-      res.end();
-    }
+//Получаем все категории пользователя
+server.get("/api/categories", function(req, res) {
+  categories.getUserCategories(req, categories => {
+    utils.sendResultOrCode(categories, 404, res);
   });
 });
 
-//Получаем всех пользователей
-server.get("/api/version", function(req, res) {
-  utils.sendResultOrCode(config.version, 404, res);
+//Добавляем категорию для пользователя
+server.post("/api/categories", function(req, res) {
+  categories.addCategory(req, result => {
+    utils.sendResultOrCode(result, 400, res);
+  });
+});
+
+//Обновляем категорию по ID
+server.put("/api/categories/:id", function(req, res) {
+  categories.updateCategoryById(req, req.params.id, req.body, result => {
+    utils.sendResultOrCode(result, 520, res);
+  });
+});
+
+//Удаляем категорию пользователя
+server.del("/api/categories/:id", function(req, res) {
+  categories.deleteCategoryById(req, req.params.id, result => {
+    utils.sendResultOrCode(result, 520, res);
+  });
 });

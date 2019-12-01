@@ -61,7 +61,19 @@ var isValidRefreshToken = function(refreshToken, callback) {
   }
 };
 
-//Получаем пользователя из refresh токена
+//Получаем пользователя из авторизационных заголовков
+var getUserFromHeaders = req => {
+  if (req.headers && req.headers.authorization) {
+    var authorization = req.headers.authorization.split(" ")[1];
+    try {
+      return getUserFromToken(authorization);
+    } catch {
+      return null;
+    }
+  }
+};
+
+//Получаем пользователя из токена
 var getUserFromToken = tokenValue => {
   let { id, email, password } = jwt.decode(tokenValue);
 
@@ -70,5 +82,7 @@ var getUserFromToken = tokenValue => {
   return user;
 };
 
+module.exports.getUserFromHeaders = getUserFromHeaders;
+module.exports.getUserFromToken = getUserFromToken;
 module.exports.createTokens = createTokens;
 module.exports.refreshTokens = refreshTokens;
