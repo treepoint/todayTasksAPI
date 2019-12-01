@@ -18,9 +18,15 @@ var startServer = () => {
   server.use(restify.plugins.acceptParser(server.acceptable));
   server.use(restify.plugins.queryParser());
   server.use(restify.plugins.bodyParser());
+  console.log;
   server.use(
     rjwt(config.jwt).unless({
-      path: ["/api/auth", "/api/users/registration", "/api/version"]
+      path: [
+        "/api/auth",
+        "/api/users/registration",
+        "/api/version",
+        "/api/reauth"
+      ]
     })
   );
 

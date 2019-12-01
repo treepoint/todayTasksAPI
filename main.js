@@ -45,13 +45,6 @@ server.del("/api/users/:id", function(req, res) {
  * Методы работы с токенами
  */
 
-//Получаем токен по ID
-server.get("/api/tokens/:id", function(req, res) {
-  tokens.getTokenById(req.params.id, token => {
-    utils.sendResultOrCode(token, 404, res);
-  });
-});
-
 //Авторизуемся в API
 server.post("/api/auth", function(req, res) {
   //Получаем пользователя по присланным данным
@@ -61,10 +54,23 @@ server.post("/api/auth", function(req, res) {
       res.end();
     } else {
       //Если получили — создаем токен
-      tokens.createToken(user, token => {
+      tokens.createTokens(user, (token, refreshToken) => {
         //Если создали — отправим клиенту
-        utils.sendResultOrCode({ token, user }, 400, res);
+        utils.sendResultOrCode({ token, refreshToken, user }, 400, res);
       });
+    }
+  });
+});
+
+//Обновляем авторизацию в API
+server.post("/api/reauth", function(req, res) {
+  tokens.refreshTokens(req.body.refreshToken, (token, refreshToken, user) => {
+    //Если создали — отправим клиенту
+    if (token && refreshToken && user) {
+      res.send({ token, refreshToken, user });
+    } else {
+      res.send(404);
+      res.end();
     }
   });
 });

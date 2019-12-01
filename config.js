@@ -21,6 +21,8 @@ module.exports = {
   },
   jwt: {
     secret: "&@$!changeme!$@&",
-    expiresIn: "4320m"
+    refreshSecret: "&@$!changememe!$@&",
+    expiresIn: "4320m",
+    refreshExpiresIn: "5760m"
   }
 };

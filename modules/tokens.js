@@ -1,66 +1,74 @@
 const config = require("../config");
 const jwt = require("jsonwebtoken");
 
-var connection = config.db.get;
-
-//Получаем токен по ID
-var getTokenById = (tokenId, callback) => {
-  connection.query("select * from tokens where id=?", [tokenId], function(
-    error,
-    results
-  ) {
-    if (error) throw error;
-    try {
-      callback(results);
-    } catch {
-      callback(null);
-    }
-  });
-};
-
-//Сохраняем токен в базу данных
-var saveToken = function(tokenId, userID, expireTime, callback) {
-  let expireDate = new Date(expireTime * 1000);
-
-  connection.query(
-    "insert into tokens VALUES (?, ?, ?)",
-
-    [tokenId, userID, expireDate],
-    function(error) {
-      if (error) throw error;
-      callback(true);
-    }
-  );
-};
-
-//Создаем токен
-var createToken = function(user, callback) {
+var createToken = function(user, secret, expiresIn) {
   //Генерируем токен
-  let token = jwt.sign(
+  let value = jwt.sign(
     { id: user.id, email: user.email, password: user.password },
-    config.jwt.secret,
+    secret,
     {
-      expiresIn: config.jwt.expiresIn
+      expiresIn: expiresIn
     }
   );
 
+  //Собираем токен в объект
   //Получаем время создания и время окончания
-  let { iat, exp } = jwt.decode(token);
+  let { iat, exp } = jwt.decode(value);
+  let token = { value, iat, exp };
 
-  //Сохраняем токен в базу
-  saveToken(token, user.id, exp, isTokenCreated => {
-    if (isTokenCreated) {
-      //Собираем токен в объект
-      token = { token, iat, exp };
+  return token;
+};
 
-      //Если все хорошо — возвращаем токен
-      if (isTokenCreated) {
-        callback(token);
-      }
+//Создаем токенs
+var createTokens = function(user, callback) {
+  let token = createToken(user, config.jwt.secret, config.jwt.expiresIn);
+
+  let refreshToken = createToken(
+    user,
+    config.jwt.refreshSecret,
+    config.jwt.refreshExpiresIn
+  );
+
+  callback(token, refreshToken);
+};
+
+//Обновляем токен по refresh token
+var refreshTokens = function(refreshTokenValue, callback) {
+  //Чекаем refresh token
+  isValidRefreshToken(refreshTokenValue, isValid => {
+    if (isValid) {
+      //Если нормально — получим пользователя по токену
+      let user = getUserFromToken(refreshTokenValue);
+
+      //Если есть пользователь — создаем токены заново и возвращаем
+      createTokens(user, (token, newRefreshToken) => {
+        callback(token, newRefreshToken, user);
+      });
     }
   });
 };
 
-module.exports.saveToken = saveToken;
-module.exports.createToken = createToken;
-module.exports.getTokenById = getTokenById;
+//Проверяем валидность refresh token
+var isValidRefreshToken = function(refreshToken, callback) {
+  if (refreshToken) {
+    jwt.verify(refreshToken, config.jwt.refreshSecret, function(err, decoded) {
+      if (err) {
+        callback(false);
+      } else {
+        callback(true);
+      }
+    });
+  }
+};
+
+//Получаем пользователя из refresh токена
+var getUserFromToken = tokenValue => {
+  let { id, email, password } = jwt.decode(tokenValue);
+
+  let user = { id, email, password };
+
+  return user;
+};
+
+module.exports.createTokens = createTokens;
+module.exports.refreshTokens = refreshTokens;
