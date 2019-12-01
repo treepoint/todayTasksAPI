@@ -1,7 +1,6 @@
 config = require("../config");
 restify = require("restify");
 const rjwt = require("restify-jwt-community");
-const jwt = require("jsonwebtoken");
 
 var startServer = () => {
   //Запускаем сервер
