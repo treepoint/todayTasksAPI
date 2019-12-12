@@ -70,8 +70,16 @@ server.get("/api/users", function(req, res) {
 
 //Добавляем пользователя
 server.post("/api/users/registration", function(req, res) {
-  users.addUser(req.body, result => {
-    utils.sendResultOrCode(result, 400, res);
+  //Но сначала проверям, что такого email еще нет в базе
+  users.getUserByEmail(req, user => {
+    if (!user) {
+      users.addUser(req.body, result => {
+        utils.sendResultOrCode(result, 400, res);
+      });
+    } else {
+      res.send(409);
+      res.end();
+    }
   });
 });
 

@@ -2,6 +2,19 @@ const config = require("../config");
 
 var connection = config.db.get;
 
+//Получаем по email. Требуется чтобы проверить введенные данные при авторизации
+var getUserByEmail = (req, callback) => {
+  connection.query(
+    "select * from users where `email`=?",
+    [req.body.email],
+    function(error, results) {
+      if (error) throw error;
+
+      callback(results[0]);
+    }
+  );
+};
+
 //Получаем ID пользователя по email или паролю
 var getUserByEmailPassword = (req, callback) => {
   connection.query(
@@ -68,6 +81,7 @@ var deleteUser = (userId, callback) => {
   });
 };
 
+module.exports.getUserByEmail = getUserByEmail;
 module.exports.getUserByEmailPassword = getUserByEmailPassword;
 module.exports.getUserById = getUserById;
 module.exports.getUsers = getUsers;
