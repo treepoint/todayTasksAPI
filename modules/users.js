@@ -18,7 +18,9 @@ var getUserByEmail = (req, callback) => {
 //Получаем ID пользователя по email или паролю
 var getUserByEmailPassword = (req, callback) => {
   connection.query(
-    "select * from users where `email`=? and `password`=?",
+    "select u.id, u.email, u.password, r.name role" +
+      " from users u, roles r " +
+      " where u.role_id = r.id and u.email=? and u.password=?",
     [req.body.email, req.body.password],
     function(error, results) {
       if (error) throw error;
@@ -30,25 +32,33 @@ var getUserByEmailPassword = (req, callback) => {
 
 //Получаем пользователя по ID
 var getUserById = (userId, callback) => {
-  connection.query("select * from users where id=?", [userId], function(
-    error,
-    results
-  ) {
-    if (error) throw error;
-    try {
-      callback(results);
-    } catch {
-      callback(null);
+  connection.query(
+    "select u.id, u.email, u.password, r.name role" +
+      " from users u, roles r " +
+      " where u.role_id = r.id and u.id=?",
+    [userId],
+    function(error, results) {
+      if (error) throw error;
+      try {
+        callback(results);
+      } catch {
+        callback(null);
+      }
     }
-  });
+  );
 };
 
 //Получаем всех пользователей
 var getUsers = callback => {
-  connection.query("select * from users", function(error, results) {
-    if (error) throw error;
-    callback(results);
-  });
+  connection.query(
+    "select u.id, u.email, u.password, r.name role" +
+      " from users u, roles r" +
+      " where u.role_id = r.id",
+    function(error, results) {
+      if (error) throw error;
+      callback(results);
+    }
+  );
 };
 
 //Добавляем пользователя
