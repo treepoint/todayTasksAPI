@@ -28,7 +28,11 @@ var getUserCategories = (req, callback) => {
     [user.id],
     function(error, results) {
       if (error) throw error;
-      callback(results);
+      try {
+        callback(results);
+      } catch {
+        callback(null);
+      }
     }
   );
 };
@@ -41,7 +45,11 @@ var addCategory = (req, callback) => {
     [user.id, req.body.category.name, req.body.category.description],
     function(error, results) {
       if (error) throw error;
-      callback(results);
+      try {
+        callback(results);
+      } catch {
+        callback(error);
+      }
     }
   );
 };
@@ -54,7 +62,11 @@ var updateCategoryById = (req, category, callback) => {
     [category.name, category.description, category.id, user.id],
     function(error, results) {
       if (error) throw error;
-      callback(results);
+      try {
+        callback(results);
+      } catch {
+        callback(error);
+      }
     }
   );
 };
@@ -67,7 +79,11 @@ var deleteCategoryById = (req, categoryId, callback) => {
     [categoryId, user.id],
     function(error) {
       if (error) throw error;
-      callback("{success}");
+      try {
+        callback("{success}");
+      } catch {
+        callback("{error}");
+      }
     }
   );
 };

@@ -9,8 +9,11 @@ var getUserByEmail = (req, callback) => {
     [req.body.email],
     function(error, results) {
       if (error) throw error;
-
-      callback(results[0]);
+      try {
+        callback(results[0]);
+      } catch {
+        callback(null);
+      }
     }
   );
 };
@@ -24,8 +27,11 @@ var getUserByEmailPassword = (req, callback) => {
     [req.body.email, req.body.password],
     function(error, results) {
       if (error) throw error;
-
-      callback(results[0]);
+      try {
+        callback(results[0]);
+      } catch {
+        callback(null);
+      }
     }
   );
 };
@@ -56,7 +62,11 @@ var getUsers = callback => {
       " where u.role_id = r.id",
     function(error, results) {
       if (error) throw error;
-      callback(results);
+      try {
+        callback(results);
+      } catch {
+        callback(null);
+      }
     }
   );
 };
@@ -65,7 +75,11 @@ var getUsers = callback => {
 var addUser = (user, callback) => {
   connection.query("INSERT INTO users SET ?", user, function(error, results) {
     if (error) throw error;
-    callback(results);
+    try {
+      callback(results);
+    } catch {
+      callback(error);
+    }
   });
 };
 
@@ -76,7 +90,11 @@ var updateUserById = (userId, user, callback) => {
     [user.email, user.password, userId],
     function(error, results) {
       if (error) throw error;
-      callback(results);
+      try {
+        callback(results);
+      } catch {
+        callback(error);
+      }
     }
   );
 };
@@ -86,8 +104,11 @@ var deleteUser = (userId, callback) => {
   connection.query("DELETE FROM `users` WHERE `id`=?", [userId], function(
     error
   ) {
-    if (error) throw error;
-    callback("{success}");
+    try {
+      callback("{success}");
+    } catch {
+      callback("{error}");
+    }
   });
 };
 
