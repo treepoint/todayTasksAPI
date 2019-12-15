@@ -4,7 +4,7 @@ const config = require("../config");
 var connection = config.db.get;
 
 //Получаем категорию по ID
-var getCategoryById = (req, categoryId, callback) => {
+var getById = (req, categoryId, callback) => {
   let user = tokens.getUserFromHeaders(req);
   connection.query(
     "select * from categories where id=? and user_id =?",
@@ -21,7 +21,7 @@ var getCategoryById = (req, categoryId, callback) => {
 };
 
 //Получаем все категории пользователя
-var getUserCategories = (req, callback) => {
+var getByUser = (req, callback) => {
   let user = tokens.getUserFromHeaders(req);
   connection.query(
     "select * from categories where user_id =?",
@@ -38,7 +38,7 @@ var getUserCategories = (req, callback) => {
 };
 
 //Добавляем категорию
-var addCategory = (req, callback) => {
+var add = (req, callback) => {
   let user = tokens.getUserFromHeaders(req);
   connection.query(
     "INSERT INTO categories SET ?",
@@ -55,7 +55,7 @@ var addCategory = (req, callback) => {
 };
 
 //Обновляем пользователя по ID
-var updateCategoryById = (req, category, callback) => {
+var updateById = (req, category, callback) => {
   let user = tokens.getUserFromHeaders(req);
   connection.query(
     "UPDATE categories SET `name`=?,`description`=? Where id=? and user_id =?",
@@ -72,7 +72,7 @@ var updateCategoryById = (req, category, callback) => {
 };
 
 //Удаляем категорию по ID
-var deleteCategoryById = (req, categoryId, callback) => {
+var deleteById = (req, categoryId, callback) => {
   let user = tokens.getUserFromHeaders(req);
   connection.query(
     "DELETE FROM categories WHERE id=? and user_id=?",
@@ -88,8 +88,8 @@ var deleteCategoryById = (req, categoryId, callback) => {
   );
 };
 
-module.exports.getCategoryById = getCategoryById;
-module.exports.getUserCategories = getUserCategories;
-module.exports.addCategory = addCategory;
-module.exports.updateCategoryById = updateCategoryById;
-module.exports.deleteCategoryById = deleteCategoryById;
+module.exports.getById = getById;
+module.exports.getByUser = getByUser;
+module.exports.add = add;
+module.exports.updateById = updateById;
+module.exports.deleteById = deleteById;

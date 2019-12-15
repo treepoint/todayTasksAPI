@@ -23,7 +23,7 @@ server.get("/api/version", function(req, res) {
 //Авторизуемся в API
 server.post("/api/auth", function(req, res) {
   //Получаем пользователя по присланным данным
-  users.getUserByEmailPassword(req, user => {
+  users.getByEmailPassword(req, user => {
     if (!user) {
       res.send(404);
       res.end();
@@ -56,14 +56,14 @@ server.post("/api/reauth", function(req, res) {
 
 //Получаем одного пользователя по ID
 server.get("/api/users/:id", function(req, res) {
-  users.getUserById(req.params.id, user => {
+  users.getById(req.params.id, user => {
     utils.sendResultOrCode(user, 404, res);
   });
 });
 
 //Получаем всех пользователей
 server.get("/api/users", function(req, res) {
-  users.getUsers(users => {
+  users.getAll(users => {
     utils.sendResultOrCode(users, 404, res);
   });
 });
@@ -71,7 +71,7 @@ server.get("/api/users", function(req, res) {
 //Добавляем пользователя
 server.post("/api/users/registration", function(req, res) {
   //Но сначала проверям, что такого email еще нет в базе
-  users.getUserByEmail(req, user => {
+  users.getByEmail(req, user => {
     if (!user) {
       users.addUser(req.body, result => {
         utils.sendResultOrCode(result, 400, res);
@@ -85,14 +85,14 @@ server.post("/api/users/registration", function(req, res) {
 
 //Обновляем пользователя по ID
 server.put("/api/users/:id", function(req, res) {
-  users.updateUserById(req.params.id, req.body, result => {
+  users.updateById(req.params.id, req.body, result => {
     utils.sendResultOrCode(result, 520, res);
   });
 });
 
 //Удаляем пользователя
 server.del("/api/users/:id", function(req, res) {
-  users.deleteUser([req.params.id], result => {
+  users.deleteById([req.params.id], result => {
     utils.sendResultOrCode(result, 520, res);
   });
 });
@@ -103,35 +103,35 @@ server.del("/api/users/:id", function(req, res) {
 
 //Получаем категорию по ID
 server.get("/api/categories/:id", function(req, res) {
-  categories.getCategoryById(req, req.params.id, category => {
+  categories.getById(req, req.params.id, category => {
     utils.sendResultOrCode(category, 404, res);
   });
 });
 
 //Получаем все категории пользователя
 server.get("/api/categories", function(req, res) {
-  categories.getUserCategories(req, categories => {
+  categories.getByUser(req, categories => {
     utils.sendResultOrCode(categories, 404, res);
   });
 });
 
 //Добавляем категорию для пользователя
 server.post("/api/categories", function(req, res) {
-  categories.addCategory(req, result => {
+  categories.add(req, result => {
     utils.sendResultOrCode(result, 400, res);
   });
 });
 
 //Обновляем категорию по ID
 server.put("/api/categories/:id", function(req, res) {
-  categories.updateCategoryById(req, req.params.id, req.body, result => {
+  categories.updateById(req, req.params.id, req.body, result => {
     utils.sendResultOrCode(result, 520, res);
   });
 });
 
 //Удаляем категорию пользователя
 server.del("/api/categories/:id", function(req, res) {
-  categories.deleteCategoryById(req, req.params.id, result => {
+  categories.deleteById(req, req.params.id, result => {
     utils.sendResultOrCode(result, 520, res);
   });
 });

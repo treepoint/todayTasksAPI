@@ -3,7 +3,7 @@ const config = require("../config");
 var connection = config.db.get;
 
 //Получаем по email. Требуется чтобы проверить введенные данные при авторизации
-var getUserByEmail = (req, callback) => {
+var getByEmail = (req, callback) => {
   connection.query(
     "select * from users where `email`=?",
     [req.body.email],
@@ -19,7 +19,7 @@ var getUserByEmail = (req, callback) => {
 };
 
 //Получаем ID пользователя по email или паролю
-var getUserByEmailPassword = (req, callback) => {
+var getByEmailPassword = (req, callback) => {
   connection.query(
     "select u.id, u.email, u.password, r.name role" +
       " from users u, roles r " +
@@ -37,7 +37,7 @@ var getUserByEmailPassword = (req, callback) => {
 };
 
 //Получаем пользователя по ID
-var getUserById = (userId, callback) => {
+var getById = (userId, callback) => {
   connection.query(
     "select u.id, u.email, u.password, r.name role" +
       " from users u, roles r " +
@@ -55,7 +55,7 @@ var getUserById = (userId, callback) => {
 };
 
 //Получаем всех пользователей
-var getUsers = callback => {
+var getAll = callback => {
   connection.query(
     "select u.id, u.email, u.password, r.name role" +
       " from users u, roles r" +
@@ -72,7 +72,7 @@ var getUsers = callback => {
 };
 
 //Добавляем пользователя
-var addUser = (user, callback) => {
+var add = (user, callback) => {
   connection.query("INSERT INTO users SET ?", user, function(error, results) {
     if (error) throw error;
     try {
@@ -84,7 +84,7 @@ var addUser = (user, callback) => {
 };
 
 //Обновляем пользователя по ID
-var updateUserById = (userId, user, callback) => {
+var updateById = (userId, user, callback) => {
   connection.query(
     "UPDATE `users` SET `email`=?,`password`=? Where id=?",
     [user.email, user.password, userId],
@@ -100,7 +100,7 @@ var updateUserById = (userId, user, callback) => {
 };
 
 //Удаляем пользователя по ID
-var deleteUser = (userId, callback) => {
+var deleteById = (userId, callback) => {
   connection.query("DELETE FROM `users` WHERE `id`=?", [userId], function(
     error
   ) {
@@ -112,10 +112,10 @@ var deleteUser = (userId, callback) => {
   });
 };
 
-module.exports.getUserByEmail = getUserByEmail;
-module.exports.getUserByEmailPassword = getUserByEmailPassword;
-module.exports.getUserById = getUserById;
-module.exports.getUsers = getUsers;
-module.exports.addUser = addUser;
-module.exports.updateUserById = updateUserById;
-module.exports.deleteUser = deleteUser;
+module.exports.getByEmail = getByEmail;
+module.exports.getByEmailPassword = getByEmailPassword;
+module.exports.getById = getById;
+module.exports.getAll = getAll;
+module.exports.add = add;
+module.exports.updateById = updateById;
+module.exports.deleteById = deleteById;
