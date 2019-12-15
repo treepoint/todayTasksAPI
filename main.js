@@ -1,10 +1,13 @@
+//Модули для работы с ДБ
 const tokens = require("./modules/tokens.js");
 const users = require("./modules/users.js");
 const categories = require("./modules/categories.js");
+const tasks = require("./modules/tasks.js");
+
+//Служебные модули
 const utils = require("./modules/utils.js");
 const startServer = require("./modules/startServer.js");
 const config = require("./config");
-
 const server = startServer();
 
 /*
@@ -56,15 +59,15 @@ server.post("/api/reauth", function(req, res) {
 
 //Получаем одного пользователя по ID
 server.get("/api/users/:id", function(req, res) {
-  users.getById(req.params.id, user => {
-    utils.sendResultOrCode(user, 404, res);
+  users.getById(req.params.id, result => {
+    utils.sendResultOrCode(result, 404, res);
   });
 });
 
 //Получаем всех пользователей
 server.get("/api/users", function(req, res) {
-  users.getAll(users => {
-    utils.sendResultOrCode(users, 404, res);
+  users.getAll(result => {
+    utils.sendResultOrCode(result, 404, res);
   });
 });
 
@@ -103,15 +106,15 @@ server.del("/api/users/:id", function(req, res) {
 
 //Получаем категорию по ID
 server.get("/api/categories/:id", function(req, res) {
-  categories.getById(req, req.params.id, category => {
-    utils.sendResultOrCode(category, 404, res);
+  categories.getById(req, req.params.id, result => {
+    utils.sendResultOrCode(result, 404, res);
   });
 });
 
 //Получаем все категории пользователя
 server.get("/api/categories", function(req, res) {
-  categories.getByUser(req, categories => {
-    utils.sendResultOrCode(categories, 404, res);
+  categories.getByUser(req, result => {
+    utils.sendResultOrCode(result, 404, res);
   });
 });
 
@@ -132,6 +135,45 @@ server.put("/api/categories/:id", function(req, res) {
 //Удаляем категорию пользователя
 server.del("/api/categories/:id", function(req, res) {
   categories.deleteById(req, req.params.id, result => {
+    utils.sendResultOrCode(result, 520, res);
+  });
+});
+
+/*
+ * Задачи
+ */
+
+//Получаем задачу по ID
+server.get("/api/tasks/:id", function(req, res) {
+  tasks.getById(req, req.params.id, result => {
+    utils.sendResultOrCode(result, 404, res);
+  });
+});
+
+//Получаем все задачи пользователя
+server.get("/api/tasks", function(req, res) {
+  tasks.getByUser(req, result => {
+    utils.sendResultOrCode(result, 404, res);
+  });
+});
+
+//Добавляем задачу для пользователя
+server.post("/api/tasks", function(req, res) {
+  tasks.add(req, result => {
+    utils.sendResultOrCode(result, 400, res);
+  });
+});
+
+//Обновляем задачу по ID
+server.put("/api/tasks/:id", function(req, res) {
+  tasks.updateById(req, req.params.id, req.body, result => {
+    utils.sendResultOrCode(result, 520, res);
+  });
+});
+
+//Удаляем задачу пользователя
+server.del("/api/tasks/:id", function(req, res) {
+  tasks.deleteById(req, req.params.id, result => {
     utils.sendResultOrCode(result, 520, res);
   });
 });
