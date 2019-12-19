@@ -4,6 +4,7 @@ const users = require("./modules/users.js");
 const categories = require("./modules/categories.js");
 const tasks = require("./modules/tasks.js");
 const taskStatuses = require("./modules/taskStatuses.js");
+const tasksLog = require("./modules/tasksLog.js");
 
 //Служебные модули
 const utils = require("./modules/utils.js");
@@ -193,6 +194,17 @@ server.get("/api/task_statuses/:id", function(req, res) {
 //Получаем все статусы
 server.get("/api/task_statuses", function(req, res) {
   taskStatuses.getAll(result => {
+    utils.sendResultOrCode(result, 404, res);
+  });
+});
+
+/*
+ * Лог выполнения задач
+ */
+
+//Получаем весь лог
+server.get("/api/tasks_log", function(req, res) {
+  tasksLog.getAll(req, result => {
     utils.sendResultOrCode(result, 404, res);
   });
 });
