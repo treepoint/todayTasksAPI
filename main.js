@@ -3,6 +3,7 @@ const tokens = require("./modules/tokens.js");
 const users = require("./modules/users.js");
 const categories = require("./modules/categories.js");
 const tasks = require("./modules/tasks.js");
+const taskStatuses = require("./modules/taskStatuses.js");
 
 //Служебные модули
 const utils = require("./modules/utils.js");
@@ -175,5 +176,23 @@ server.put("/api/tasks/:id", function(req, res) {
 server.del("/api/tasks/:id", function(req, res) {
   tasks.deleteById(req, req.params.id, result => {
     utils.sendResultOrCode(result, 520, res);
+  });
+});
+
+/*
+ * Статусы задач
+ */
+
+//Получаем статус по ID
+server.get("/api/task_statuses/:id", function(req, res) {
+  taskStatuses.getById(req, req.params.id, result => {
+    utils.sendResultOrCode(result, 404, res);
+  });
+});
+
+//Получаем все статусы
+server.get("/api/task_statuses", function(req, res) {
+  taskStatuses.getAll(result => {
+    utils.sendResultOrCode(result, 404, res);
   });
 });
