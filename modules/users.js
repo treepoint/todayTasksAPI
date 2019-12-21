@@ -57,7 +57,7 @@ var getById = (userId, callback) => {
 //Получаем всех пользователей
 var getAll = callback => {
   connection.query(
-    "select u.id, u.email, u.password, r.name role" +
+    "select u.id, u.email, u.password, u.role_id, r.name role" +
       " from users u, roles r" +
       " where u.role_id = r.id",
     function(error, results) {
@@ -86,8 +86,8 @@ var add = (user, callback) => {
 //Обновляем пользователя по ID
 var updateById = (userId, user, callback) => {
   connection.query(
-    "UPDATE `users` SET `email`=?,`password`=? Where id=?",
-    [user.email, user.password, userId],
+    "update users set email=?, password=?, role_id=? Where id=?",
+    [user.email, user.password, user.role_id, userId],
     function(error, results) {
       if (error) throw error;
       try {

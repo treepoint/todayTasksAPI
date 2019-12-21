@@ -1,6 +1,7 @@
 //Модули для работы с ДБ
 const tokens = require("./modules/tokens.js");
 const users = require("./modules/users.js");
+const roles = require("./modules/roles.js");
 const categories = require("./modules/categories.js");
 const tasks = require("./modules/tasks.js");
 const taskStatuses = require("./modules/taskStatuses.js");
@@ -99,6 +100,17 @@ server.put("/api/users/:id", function(req, res) {
 server.del("/api/users/:id", function(req, res) {
   users.deleteById([req.params.id], result => {
     utils.sendResultOrCode(result, 520, res);
+  });
+});
+
+/*
+ * Роли
+ */
+
+//Получаем всех пользователей
+server.get("/api/roles", function(req, res) {
+  roles.getAll(result => {
+    utils.sendResultOrCode(result, 404, res);
   });
 });
 
