@@ -55,11 +55,11 @@ var add = (req, callback) => {
 };
 
 //Обновляем пользователя по ID
-var updateById = (req, category, callback) => {
+var updateById = (req, id, category, callback) => {
   let user = tokens.getUserFromHeaders(req);
   connection.query(
     "UPDATE categories SET `name`=?,`description`=? Where id=? and user_id =?",
-    [category.name, category.description, category.id, user.id],
+    [category.name, category.description, id, user.id],
     function(error, results) {
       if (error) throw error;
       try {
