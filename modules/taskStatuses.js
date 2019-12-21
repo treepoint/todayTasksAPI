@@ -32,5 +32,22 @@ var getAll = callback => {
   });
 };
 
+//Обновляем статус по ID
+var updateById = (ID, status, callback) => {
+  connection.query(
+    "UPDATE `task_statuses` SET `name`=? Where id=?",
+    [status.name, ID],
+    function(error, results) {
+      if (error) throw error;
+      try {
+        callback(results);
+      } catch {
+        callback(error);
+      }
+    }
+  );
+};
+
 module.exports.getById = getById;
 module.exports.getAll = getAll;
+module.exports.updateById = updateById;

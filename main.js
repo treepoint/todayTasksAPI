@@ -198,6 +198,13 @@ server.get("/api/task_statuses", function(req, res) {
   });
 });
 
+//Обновляем статус по ID
+server.put("/api/task_statuses/:id", function(req, res) {
+  taskStatuses.updateById(req.params.id, req.body, result => {
+    utils.sendResultOrCode(result, 520, res);
+  });
+});
+
 /*
  * Лог выполнения задач
  */
