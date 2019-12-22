@@ -108,7 +108,7 @@ server.del("/api/users/:id", function(req, res) {
  */
 
 //Получаем всех пользователей
-server.get("/api/roles", function(req, res) {
+server.get("/api/roles", function(res) {
   roles.getAll(result => {
     utils.sendResultOrCode(result, 404, res);
   });
@@ -180,7 +180,7 @@ server.post("/api/tasks", function(req, res) {
 
 //Обновляем задачу по ID
 server.put("/api/tasks/:id", function(req, res) {
-  tasks.updateById(req, req.params.id, req.body, result => {
+  tasks.updateById(req, req.body, result => {
     utils.sendResultOrCode(result, 520, res);
   });
 });
