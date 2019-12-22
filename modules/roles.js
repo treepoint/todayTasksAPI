@@ -11,7 +11,7 @@ var getAll = callback => {
       try {
         callback(results);
       } catch {
-        callback(null);
+        callback(error);
       }
     }
   );

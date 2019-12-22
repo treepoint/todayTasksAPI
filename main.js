@@ -107,8 +107,8 @@ server.del("/api/users/:id", function(req, res) {
  * Роли
  */
 
-//Получаем всех пользователей
-server.get("/api/roles", function(res) {
+//Получаем все роли пользователей
+server.get("/api/roles", function(req, res) {
   roles.getAll(result => {
     utils.sendResultOrCode(result, 404, res);
   });

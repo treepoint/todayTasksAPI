@@ -14,7 +14,7 @@ var getById = (req, statusId, callback) => {
       try {
         callback(results);
       } catch {
-        callback(null);
+        callback(error);
       }
     }
   );
@@ -23,11 +23,11 @@ var getById = (req, statusId, callback) => {
 //Получаем все статусы
 var getAll = callback => {
   connection.query("select * from task_statuses", function(error, results) {
-    if (error) throw error;
+    // if (error) throw error;
     try {
       callback(results);
     } catch {
-      callback(null);
+      callback(error);
     }
   });
 };
