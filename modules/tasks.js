@@ -68,9 +68,8 @@ var add = (req, callback) => {
 var updateById = (req, task, callback) => {
   let user = tokens.getUserFromHeaders(req);
   connection.query(
-    "UPDATE tasks SET `user_id`=?,`category_id`=?, `status_id`=?, `name`=?, `description`=? Where id=? and user_id =?",
+    "UPDATE tasks SET `category_id`=?, `status_id`=?, `name`=?, `description`=? Where id=? and user_id =?",
     [
-      task.user_id,
       task.category_id,
       task.status_id,
       task.name,
