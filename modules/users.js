@@ -101,9 +101,7 @@ var updateById = (userId, user, callback) => {
 
 //Удаляем пользователя по ID
 var deleteById = (userId, callback) => {
-  connection.query("DELETE FROM `users` WHERE `id`=?", [userId], function(
-    error
-  ) {
+  connection.query("delete from users where id=?", [userId], function(error) {
     try {
       callback("{success}");
     } catch {

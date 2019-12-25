@@ -79,7 +79,7 @@ server.post("/api/users/registration", function(req, res) {
   //Но сначала проверям, что такого email еще нет в базе
   users.getByEmail(req, user => {
     if (!user) {
-      users.addUser(req.body, result => {
+      users.add(req.body, result => {
         utils.sendResultOrCode(result, 400, res);
       });
     } else {
@@ -213,6 +213,20 @@ server.get("/api/task_statuses", function(req, res) {
 //Обновляем статус по ID
 server.put("/api/task_statuses/:id", function(req, res) {
   taskStatuses.updateById(req.params.id, req.body, result => {
+    utils.sendResultOrCode(result, 520, res);
+  });
+});
+
+//Добавляем статус
+server.post("/api/task_statuses", function(req, res) {
+  taskStatuses.add(req.body, result => {
+    utils.sendResultOrCode(result, 400, res);
+  });
+});
+
+//Удаляем статус
+server.del("/api/task_statuses/:id", function(req, res) {
+  taskStatuses.deleteById([req.params.id], result => {
     utils.sendResultOrCode(result, 520, res);
   });
 });

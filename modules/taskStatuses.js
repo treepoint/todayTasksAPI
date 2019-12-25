@@ -35,7 +35,7 @@ var getAll = callback => {
 //Обновляем статус по ID
 var updateById = (ID, status, callback) => {
   connection.query(
-    "UPDATE `task_statuses` SET `name`=? Where id=?",
+    "update task_statuses set name=? where id=?",
     [status.name, ID],
     function(error, results) {
       if (error) throw error;
@@ -48,6 +48,36 @@ var updateById = (ID, status, callback) => {
   );
 };
 
+//Добавляем статус
+var add = (status, callback) => {
+  connection.query("insert into task_statuses set ?", status, function(
+    error,
+    results
+  ) {
+    if (error) throw error;
+    try {
+      callback(results);
+    } catch {
+      callback(error);
+    }
+  });
+};
+
+//Удаляем пользователя по ID
+var deleteById = (statusId, callback) => {
+  connection.query("delete from task_statuses where id=?", [statusId], function(
+    error
+  ) {
+    try {
+      callback("{success}");
+    } catch {
+      callback("{error}");
+    }
+  });
+};
+
 module.exports.getById = getById;
 module.exports.getAll = getAll;
 module.exports.updateById = updateById;
+module.exports.add = add;
+module.exports.deleteById = deleteById;
