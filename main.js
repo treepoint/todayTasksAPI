@@ -241,3 +241,17 @@ server.get("/api/tasks_log", function(req, res) {
     utils.sendResultOrCode(result, 404, res);
   });
 });
+
+//Добавляем статус
+server.post("/api/tasks_log", function(req, res) {
+  tasksLog.add(req, result => {
+    utils.sendResultOrCode(result, 400, res);
+  });
+});
+
+//Удаляем статус
+server.del("/api/tasks_log/:id", function(req, res) {
+  tasksLog.deleteById([req.params.id], result => {
+    utils.sendResultOrCode(result, 520, res);
+  });
+});

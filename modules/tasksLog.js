@@ -22,4 +22,37 @@ var getAll = (req, callback) => {
   );
 };
 
+//Добавляем запись в лог
+var add = (req, callback) => {
+  let taskLog = req.body;
+
+  connection.query("insert into task_log set ?", taskLog, function(
+    error,
+    results
+  ) {
+    if (error) throw error;
+    try {
+      callback(results);
+    } catch {
+      callback(error);
+    }
+  });
+};
+
+//Удаляем запись в логе по ID
+var deleteById = (taskId, callback) => {
+  connection.query("delete from task_log where id=?", [taskId], function(
+    error
+  ) {
+    if (error) throw error;
+    try {
+      callback("{success}");
+    } catch {
+      callback("{error}");
+    }
+  });
+};
+
 module.exports.getAll = getAll;
+module.exports.add = add;
+module.exports.deleteById = deleteById;

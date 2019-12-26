@@ -44,24 +44,19 @@ var getByUser = (req, callback) => {
 //Добавляем задачу
 var add = (req, callback) => {
   let user = tokens.getUserFromHeaders(req);
-  connection.query(
-    "INSERT INTO tasks SET ?",
-    [
-      user.id,
-      req.body.task.category_id,
-      req.body.task.status_id,
-      req.body.task.name,
-      req.body.task.description
-    ],
-    function(error, results) {
-      if (error) throw error;
-      try {
-        callback(results);
-      } catch {
-        callback(error);
-      }
+
+  let task = {};
+
+  Object.assign(task, { user_id: user.id }, req.body);
+
+  connection.query("INSERT INTO tasks SET ?", task, function(error, results) {
+    if (error) throw error;
+    try {
+      callback(results);
+    } catch {
+      callback(error);
     }
-  );
+  });
 };
 
 //Обновляем задачу по ID
