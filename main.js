@@ -242,14 +242,21 @@ server.get("/api/tasks_log", function(req, res) {
   });
 });
 
-//Добавляем статус
+//Обновляем лог по ID
+server.put("/api/tasks_log/:id", function(req, res) {
+  tasksLog.updateById(req.params.id, req.body, result => {
+    utils.sendResultOrCode(result, 520, res);
+  });
+});
+
+//Добавляем лог
 server.post("/api/tasks_log", function(req, res) {
   tasksLog.add(req, result => {
     utils.sendResultOrCode(result, 400, res);
   });
 });
 
-//Удаляем статус
+//Удаляем лог
 server.del("/api/tasks_log/:id", function(req, res) {
   tasksLog.deleteById([req.params.id], result => {
     utils.sendResultOrCode(result, 520, res);

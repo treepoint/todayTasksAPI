@@ -7,7 +7,7 @@ var connection = config.db.get;
 var getAll = (req, callback) => {
   let user = tokens.getUserFromHeaders(req);
   connection.query(
-    "select tl.id, t.name task_name, DATE_FORMAT(tl.execution_start,'%H:%i:%s') execution_start, DATE_FORMAT(tl.execution_end,'%H:%i:%s') execution_end," +
+    "select tl.id, tl.task_id, t.name task_name, DATE_FORMAT(tl.execution_start,'%H:%i') execution_start, DATE_FORMAT(tl.execution_end,'%H:%i') execution_end," +
       " TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end) execution_time" +
       " from task_log tl, tasks t where tl.task_id = t.id and t.user_id =?",
     [user.id],
@@ -53,6 +53,28 @@ var deleteById = (taskId, callback) => {
   });
 };
 
+//Обновляем лог по ID
+var updateById = (id, taskLog, callback) => {
+  connection.query(
+    "update task_log set task_id=?, execution_start=CONCAT(DATE(execution_start),  ?), execution_end=CONCAT(DATE(execution_end),  ?) where id=?",
+    [
+      taskLog.task_id,
+      " " + taskLog.execution_start,
+      " " + taskLog.execution_end,
+      id
+    ],
+    function(error, results) {
+      if (error) throw error;
+      try {
+        callback(results);
+      } catch {
+        callback(error);
+      }
+    }
+  );
+};
+
 module.exports.getAll = getAll;
 module.exports.add = add;
 module.exports.deleteById = deleteById;
+module.exports.updateById = updateById;
