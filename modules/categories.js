@@ -92,13 +92,16 @@ var deleteById = (req, categoryId, callback) => {
 var getTimeExecutionForAll = (req, callback) => {
   let user = tokens.getUserFromHeaders(req);
   connection.query(
-    "select c.name, SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time" +
+    "select category_name name, SUM(execution_time) execution_time  from" +
+      " (select c.name category_name, TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end) execution_time" +
       " from task_log tl," +
       " tasks t," +
       " categories c" +
       " where tl.task_id = t.id" +
       " and c.id = t.category_id" +
       " and t.user_id = ?" +
+      " ) t" +
+      " where t.execution_time >= 0" +
       " group by 1",
     [user.id],
     function(error, results) {
