@@ -154,6 +154,17 @@ server.del("/api/categories/:id", function(req, res) {
 });
 
 /*
+ * Статистика по категориям
+ */
+
+//Получаем время исполнения по всем категориям
+server.get("/api/categories/time_execution/all", function(req, res) {
+  categories.getTimeExecutionForAll(req, result => {
+    utils.sendResultOrCode(result, 404, res);
+  });
+});
+
+/*
  * Задачи
  */
 

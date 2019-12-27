@@ -88,8 +88,33 @@ var deleteById = (req, categoryId, callback) => {
   );
 };
 
+//Получаем время исполнения по категориям
+var getTimeExecutionForAll = (req, callback) => {
+  let user = tokens.getUserFromHeaders(req);
+  connection.query(
+    "select c.name, SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time" +
+      " from task_log tl," +
+      " tasks t," +
+      " categories c" +
+      " where tl.task_id = t.id" +
+      " and c.id = t.category_id" +
+      " and t.user_id = ?" +
+      " group by 1",
+    [user.id],
+    function(error, results) {
+      if (error) throw error;
+      try {
+        callback(results);
+      } catch {
+        callback(null);
+      }
+    }
+  );
+};
+
 module.exports.getById = getById;
 module.exports.getByUser = getByUser;
 module.exports.add = add;
 module.exports.updateById = updateById;
 module.exports.deleteById = deleteById;
+module.exports.getTimeExecutionForAll = getTimeExecutionForAll;
