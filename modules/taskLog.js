@@ -40,8 +40,8 @@ var add = (req, callback) => {
 };
 
 //Удаляем запись в логе по ID
-var deleteById = (taskId, callback) => {
-  connection.query("delete from task_log where id=?", [taskId], function(
+var deleteById = (taskLogId, callback) => {
+  connection.query("delete from task_log where id=?", [taskLogId], function(
     error
   ) {
     if (error) throw error;
@@ -49,6 +49,20 @@ var deleteById = (taskId, callback) => {
       callback("{success}");
     } catch {
       callback("{error}");
+    }
+  });
+};
+
+//Удаляем все записи в логе по задаче
+var deleteByTaskId = (taskId, callback) => {
+  connection.query("delete from task_log where task_id=?", [taskId], function(
+    error
+  ) {
+    if (error) throw error;
+    try {
+      callback(true);
+    } catch {
+      callback(false);
     }
   });
 };
@@ -77,4 +91,5 @@ var updateById = (id, taskLog, callback) => {
 module.exports.getAll = getAll;
 module.exports.add = add;
 module.exports.deleteById = deleteById;
+module.exports.deleteByTaskId = deleteByTaskId;
 module.exports.updateById = updateById;

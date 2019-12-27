@@ -5,7 +5,7 @@ const roles = require("./modules/roles.js");
 const categories = require("./modules/categories.js");
 const tasks = require("./modules/tasks.js");
 const taskStatuses = require("./modules/taskStatuses.js");
-const tasksLog = require("./modules/tasksLog.js");
+const taskLog = require("./modules/taskLog.js");
 
 //Служебные модули
 const utils = require("./modules/utils.js");
@@ -248,28 +248,28 @@ server.del("/api/task_statuses/:id", function(req, res) {
 
 //Получаем весь лог
 server.get("/api/tasks_log", function(req, res) {
-  tasksLog.getAll(req, result => {
+  taskLog.getAll(req, result => {
     utils.sendResultOrCode(result, 404, res);
   });
 });
 
 //Обновляем лог по ID
 server.put("/api/tasks_log/:id", function(req, res) {
-  tasksLog.updateById(req.params.id, req.body, result => {
+  taskLog.updateById(req.params.id, req.body, result => {
     utils.sendResultOrCode(result, 520, res);
   });
 });
 
 //Добавляем лог
 server.post("/api/tasks_log", function(req, res) {
-  tasksLog.add(req, result => {
+  taskLog.add(req, result => {
     utils.sendResultOrCode(result, 400, res);
   });
 });
 
 //Удаляем лог
 server.del("/api/tasks_log/:id", function(req, res) {
-  tasksLog.deleteById([req.params.id], result => {
+  taskLog.deleteById([req.params.id], result => {
     utils.sendResultOrCode(result, 520, res);
   });
 });

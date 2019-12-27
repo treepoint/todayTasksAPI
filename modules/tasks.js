@@ -1,4 +1,5 @@
 const tokens = require("./tokens.js");
+const taskLog = require("./taskLog.js");
 const config = require("../config");
 
 var connection = config.db.get;
@@ -86,18 +87,26 @@ var updateById = (req, task, callback) => {
 //Удаляем задачу по ID
 var deleteById = (req, taskId, callback) => {
   let user = tokens.getUserFromHeaders(req);
-  connection.query(
-    "DELETE FROM tasks WHERE id=? and user_id=?",
-    [taskId, user.id],
-    function(error) {
-      if (error) throw error;
-      try {
-        callback("{success}");
-      } catch {
-        callback("{error}");
-      }
+
+  taskLog.deleteByTaskId(taskId, success => {
+    if (success) {
+      connection.query(
+        "DELETE FROM tasks WHERE id=? and user_id=?",
+        [taskId, user.id],
+        function(error) {
+          if (error) throw error;
+          try {
+            callback("{success}");
+          } catch {
+            callback("{error}");
+          }
+        }
+      );
+    } else {
+      res.send(409);
+      res.end();
     }
-  );
+  });
 };
 
 module.exports.getById = getById;
