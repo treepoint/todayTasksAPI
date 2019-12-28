@@ -40,9 +40,14 @@ var getByUser = (req, callback) => {
 //Добавляем категорию
 var add = (req, callback) => {
   let user = tokens.getUserFromHeaders(req);
+
   connection.query(
     "INSERT INTO categories SET ?",
-    [user.id, req.body.category.name, req.body.category.description],
+    {
+      user_id: user.id,
+      name: req.body.name,
+      description: req.body.description
+    },
     function(error, results) {
       if (error) throw error;
       try {
@@ -54,7 +59,7 @@ var add = (req, callback) => {
   );
 };
 
-//Обновляем катгорию по ID
+//Обновляем категорию по ID
 var updateById = (req, categoryId, category, callback) => {
   let user = tokens.getUserFromHeaders(req);
   connection.query(
@@ -75,7 +80,7 @@ var updateById = (req, categoryId, category, callback) => {
 var deleteById = (req, categoryId, callback) => {
   let user = tokens.getUserFromHeaders(req);
   connection.query(
-    "DELETE FROM categories WHERE id=? and user_id=?",
+    "delete from categories where id=? and user_id=?",
     [categoryId, user.id],
     function(error) {
       if (error) throw error;

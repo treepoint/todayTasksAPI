@@ -73,7 +73,7 @@ var getAll = callback => {
 
 //Добавляем пользователя
 var add = (user, callback) => {
-  connection.query("INSERT INTO users SET ?", user, function(error, results) {
+  connection.query("insert into users set ?", user, function(error, results) {
     if (error) throw error;
     try {
       callback(results);
