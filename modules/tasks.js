@@ -125,6 +125,9 @@ var getByDate = (req, date, callback) => {
 
 //Добавляем задачу
 var add = (req, callback) => {
+  let task = {};
+  let user = tokens.getUserFromHeaders(req);
+
   Object.assign(task, { user_id: user.id }, req.body);
 
   connection.query("INSERT INTO tasks SET ?", task, function(error, results) {
