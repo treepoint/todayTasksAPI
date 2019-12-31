@@ -5,6 +5,7 @@ const roles = require("./modules/roles.js");
 const categories = require("./modules/categories.js");
 const tasks = require("./modules/tasks.js");
 const taskStatuses = require("./modules/taskStatuses.js");
+const taskStatusesTypes = require("./modules/taskStatusesTypes.js");
 const taskLog = require("./modules/taskLog.js");
 
 //Служебные модули
@@ -182,6 +183,13 @@ server.get("/api/tasks", function(req, res) {
   });
 });
 
+//Получаем все задачи пользователя за определенную дату
+server.get("/api/tasks/date/:date", function(req, res) {
+  tasks.getByDate(req, req.params.date, result => {
+    utils.sendResultOrCode(result, 404, res);
+  });
+});
+
 //Добавляем задачу для пользователя
 server.post("/api/tasks", function(req, res) {
   tasks.add(req, result => {
@@ -243,12 +251,30 @@ server.del("/api/task_statuses/:id", function(req, res) {
 });
 
 /*
+ * Типы статусов задач
+ */
+
+//Получаем все статусы задач
+server.get("/api/task_statuses_types", function(req, res) {
+  taskStatusesTypes.getAll(result => {
+    utils.sendResultOrCode(result, 404, res);
+  });
+});
+
+/*
  * Лог выполнения задач
  */
 
 //Получаем весь лог
 server.get("/api/tasks_log", function(req, res) {
   taskLog.getAll(req, result => {
+    utils.sendResultOrCode(result, 404, res);
+  });
+});
+
+//Получаем весь лог за определенную дату
+server.get("/api/tasks_log/date/:date", function(req, res) {
+  taskLog.getByDate(req, req.params.date, result => {
     utils.sendResultOrCode(result, 404, res);
   });
 });

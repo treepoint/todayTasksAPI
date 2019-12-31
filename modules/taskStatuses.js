@@ -29,7 +29,6 @@ var getAll = (req, callback) => {
     "select * from task_statuses where user_id = ?",
     user.id,
     function(error, results) {
-      // if (error) throw error;
       try {
         callback(results);
       } catch {
@@ -63,7 +62,7 @@ var add = (req, status, callback) => {
 
   connection.query(
     "insert into task_statuses set ?",
-    { name: status.name, user_id: user.id },
+    { name: status.name, type_id: status.type_id, user_id: user.id },
     function(error, results) {
       if (error) throw error;
       try {

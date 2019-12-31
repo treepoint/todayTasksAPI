@@ -22,6 +22,25 @@ var getAll = (req, callback) => {
   );
 };
 
+//Получаем весь лог, который был сделан в нужный день
+var getByDate = (req, date, callback) => {
+  let user = tokens.getUserFromHeaders(req);
+  connection.query(
+    "select tl.id, tl.task_id, t.name task_name, DATE_FORMAT(tl.execution_start,'%H:%i') execution_start, DATE_FORMAT(tl.execution_end,'%H:%i') execution_end," +
+      " TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end) execution_time" +
+      " from task_log tl, tasks t where tl.task_id = t.id and t.user_id =? and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') = ? ",
+    [user.id, date],
+    function(error, results) {
+      if (error) throw error;
+      try {
+        callback(results);
+      } catch {
+        callback(null);
+      }
+    }
+  );
+};
+
 //Добавляем запись в лог
 var add = (req, callback) => {
   let taskLog = req.body;
@@ -89,6 +108,7 @@ var updateById = (id, taskLog, callback) => {
 };
 
 module.exports.getAll = getAll;
+module.exports.getByDate = getByDate;
 module.exports.add = add;
 module.exports.deleteById = deleteById;
 module.exports.deleteByTaskId = deleteByTaskId;

@@ -42,12 +42,89 @@ var getByUser = (req, callback) => {
   );
 };
 
-//Добавляем задачу
-var add = (req, callback) => {
+//Получаем все задачи пользователя по дате
+var getByDate = (req, date, callback) => {
   let user = tokens.getUserFromHeaders(req);
 
-  let task = {};
+  connection.query(
+    //Здесь какая логика. Получаем задачи, который были заведены в указанную дату
+    "select *, " +
+    "  (select SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time " +
+    "   from task_log tl " +
+    "  where tl.task_id = t.id" +
+    "  and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') = ?) execution_time" +
+    "  from (" +
+    " select t.id," +
+    "  t.user_id, " +
+    "  t.name, " +
+    "  t.description, " +
+    "  c.name category_name, " +
+    "  t.category_id, " +
+    "  ts.name status_name, " +
+    "  t.status_id" +
+    " from tasks t, " +
+    "  categories c, " +
+    "  task_statuses ts" +
+    " where t.category_id = c.id " +
+    "   and t.status_id = ts.id " +
+    "   and DATE_FORMAT(t.create_date,'%Y-%m-%d') = ? " +
+    "   and t.user_id =? " +
+    //Потом получаем задачи, у которых тип статуса не «завершено»
+    " union  " +
+    " select t.id, " +
+    "  t.user_id, " +
+    "  t.name, " +
+    "  t.description, " +
+    "  c.name category_name, " +
+    "  t.category_id, " +
+    "  ts.name status_name, " +
+    "  t.status_id" +
+    " from tasks t, " +
+    "  categories c, " +
+    "  task_statuses ts" +
+    " where t.category_id = c.id " +
+    "   and t.status_id = ts.id " +
+    "   and DATE_FORMAT(t.create_date,'%Y-%m-%d') <= ? " +
+    "   and t.user_id = ?" +
+    "   and ts.type_id !=2" + //Не завершено
+      //И все задачи, по которым были записи в этот день
+      " union " +
+      " select t.id, " +
+      " t.user_id, " +
+      " t.name, " +
+      " t.description, " +
+      " c.name category_name, " +
+      " t.category_id, " +
+      " ts.name status_name, " +
+      " t.status_id" +
+      " from tasks t, " +
+      " categories c, " +
+      " task_statuses ts" +
+      " where t.category_id = c.id " +
+      " and t.status_id = ts.id " +
+      " and DATE_FORMAT(t.create_date,'%Y-%m-%d') <= ? " +
+      " and t.user_id = ?" +
+      //Уот здесь как раз чекаем наличие записей
+      " and exists (select * from task_log tl" +
+      "              where tl.task_id = t.id" +
+      "                and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') = ?" +
+      "              limit 1)" +
+      " ) t" +
+      "  order by 1", //Сортируем по ID
+    [date, date, user.id, date, user.id, date, user.id, date],
+    function(error, results) {
+      if (error) throw error;
+      try {
+        callback(results);
+      } catch {
+        callback(null);
+      }
+    }
+  );
+};
 
+//Добавляем задачу
+var add = (req, callback) => {
   Object.assign(task, { user_id: user.id }, req.body);
 
   connection.query("INSERT INTO tasks SET ?", task, function(error, results) {
@@ -110,6 +187,7 @@ var deleteById = (req, taskId, callback) => {
 };
 
 module.exports.getById = getById;
+module.exports.getByDate = getByDate;
 module.exports.getByUser = getByUser;
 module.exports.add = add;
 module.exports.updateById = updateById;
