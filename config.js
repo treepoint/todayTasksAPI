@@ -5,7 +5,7 @@ var mysql = require("mysql");
 module.exports = {
   name: "haveDoneAPI",
   hostname: "http://localhost/api/",
-  version: "0.2.1",
+  version: "0.2.2",
   env: process.env.NODE_ENV || "development",
   port: process.env.PORT || 5000,
   db: {
