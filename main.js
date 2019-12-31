@@ -216,28 +216,28 @@ server.get("/api/task_statuses/:id", function(req, res) {
 
 //Получаем все статусы
 server.get("/api/task_statuses", function(req, res) {
-  taskStatuses.getAll(result => {
+  taskStatuses.getAll(req, result => {
     utils.sendResultOrCode(result, 404, res);
   });
 });
 
 //Обновляем статус по ID
 server.put("/api/task_statuses/:id", function(req, res) {
-  taskStatuses.updateById(req.params.id, req.body, result => {
+  taskStatuses.updateById(req, req.params.id, req.body, result => {
     utils.sendResultOrCode(result, 520, res);
   });
 });
 
 //Добавляем статус
 server.post("/api/task_statuses", function(req, res) {
-  taskStatuses.add(req.body, result => {
+  taskStatuses.add(req, req.body, result => {
     utils.sendResultOrCode(result, 400, res);
   });
 });
 
 //Удаляем статус
 server.del("/api/task_statuses/:id", function(req, res) {
-  taskStatuses.deleteById([req.params.id], result => {
+  taskStatuses.deleteById(req, req.params.id, result => {
     utils.sendResultOrCode(result, 520, res);
   });
 });
