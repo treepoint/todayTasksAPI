@@ -43,8 +43,8 @@ var updateById = (req, ID, status, callback) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "update task_statuses set name=? where id=? and user_id = ?",
-    [status.name, ID, user.id],
+    "update task_statuses set name=?, type_id = ? where id=? and user_id = ?",
+    [status.name, status.type_id, ID, user.id],
     function(error, results) {
       if (error) throw error;
       try {
