@@ -7,6 +7,7 @@ const tasks = require("./modules/tasks.js");
 const taskStatuses = require("./modules/taskStatuses.js");
 const taskStatusesTypes = require("./modules/taskStatusesTypes.js");
 const taskLog = require("./modules/taskLog.js");
+const statistics = require("./modules/statistics.js");
 
 //Служебные модули
 const utils = require("./modules/utils.js");
@@ -155,17 +156,6 @@ server.del("/api/categories/:id", function(req, res) {
 });
 
 /*
- * Статистика по категориям
- */
-
-//Получаем время исполнения по всем категориям
-server.get("/api/categories/time_execution/all", function(req, res) {
-  categories.getTimeExecutionForAll(req, result => {
-    utils.sendResultOrCode(result, 404, res);
-  });
-});
-
-/*
  * Задачи
  */
 
@@ -298,4 +288,27 @@ server.del("/api/tasks_log/:id", function(req, res) {
   taskLog.deleteById([req.params.id], result => {
     utils.sendResultOrCode(result, 520, res);
   });
+});
+
+/*
+ * Статистика
+ */
+
+//Получаем время исполнения по всем категориям
+server.get("/api/categories/time_execution/all", function(req, res) {
+  categories.getTimeExecutionForAll(req, result => {
+    utils.sendResultOrCode(result, 404, res);
+  });
+});
+
+//Получаем время исполнения задач по конкретному периоду
+server.get("/api/tasks/statistic/period/:dateFrom/:dateTo", function(req, res) {
+  statistics.getTasksExecutionTimeByPeriod(
+    req,
+    req.params.dateFrom,
+    req.params.dateTo,
+    result => {
+      utils.sendResultOrCode(result, 404, res);
+    }
+  );
 });
