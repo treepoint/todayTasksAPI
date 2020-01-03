@@ -1,6 +1,5 @@
 //Модули для работы с ДБ
-const tokens = require("./modules/tokens.js"),
-  users = require("./modules/users.js"),
+const users = require("./modules/users.js"),
   roles = require("./modules/roles.js"),
   categories = require("./modules/categories.js"),
   tasks = require("./modules/tasks.js"),
