@@ -1,19 +1,20 @@
 //Модули для работы с ДБ
-const tokens = require("./modules/tokens.js");
-const users = require("./modules/users.js");
-const roles = require("./modules/roles.js");
-const categories = require("./modules/categories.js");
-const tasks = require("./modules/tasks.js");
-const taskStatuses = require("./modules/taskStatuses.js");
-const taskStatusesTypes = require("./modules/taskStatusesTypes.js");
-const taskLog = require("./modules/taskLog.js");
-const statistics = require("./modules/statistics.js");
+const tokens = require("./modules/tokens.js"),
+  users = require("./modules/users.js"),
+  roles = require("./modules/roles.js"),
+  categories = require("./modules/categories.js"),
+  tasks = require("./modules/tasks.js"),
+  taskStatuses = require("./modules/taskStatuses.js"),
+  taskStatusesTypes = require("./modules/taskStatusesTypes.js"),
+  taskLog = require("./modules/taskLog.js"),
+  auth = require("./modules/auth.js"),
+  statistics = require("./modules/statistics.js");
 
 //Служебные модули
-const utils = require("./modules/utils.js");
-const startServer = require("./modules/startServer.js");
-const config = require("./config");
-const server = startServer();
+const utils = require("./modules/utils.js"),
+  startServer = require("./modules/startServer.js"),
+  config = require("./config"),
+  server = startServer();
 
 /*
  * Служебное
@@ -30,32 +31,12 @@ server.get("/api/version", function(req, res) {
 
 //Авторизуемся в API
 server.post("/api/auth", function(req, res) {
-  //Получаем пользователя по присланным данным
-  users.getByEmailPassword(req, user => {
-    if (!user) {
-      res.send(404);
-      res.end();
-    } else {
-      //Если получили — создаем токен
-      tokens.createTokens(user, (token, refreshToken) => {
-        //Если создали — отправим клиенту
-        utils.sendResultOrCode({ token, refreshToken, user }, 400, res);
-      });
-    }
-  });
+  auth.auth(req, res);
 });
 
 //Обновляем авторизацию в API
 server.post("/api/reauth", function(req, res) {
-  tokens.refreshTokens(req.body.refreshToken, (token, refreshToken, user) => {
-    //Если создали — отправим клиенту
-    if (token && refreshToken && user) {
-      res.send({ token, refreshToken, user });
-    } else {
-      res.send(404);
-      res.end();
-    }
-  });
+  auth.reauth(req, res);
 });
 
 /*
@@ -64,45 +45,27 @@ server.post("/api/reauth", function(req, res) {
 
 //Получаем одного пользователя по ID
 server.get("/api/users/:id", function(req, res) {
-  users.getById(req.params.id, result => {
-    utils.sendResultOrCode(result, 404, res);
-  });
+  users.getById(req, res);
 });
 
 //Получаем всех пользователей
 server.get("/api/users", function(req, res) {
-  users.getAll(result => {
-    utils.sendResultOrCode(result, 404, res);
-  });
+  users.getAll(req, res);
 });
 
 //Добавляем пользователя
 server.post("/api/users/registration", function(req, res) {
-  //Но сначала проверям, что такого email еще нет в базе
-  users.getByEmail(req, user => {
-    if (!user) {
-      users.add(req.body, result => {
-        utils.sendResultOrCode(result, 400, res);
-      });
-    } else {
-      res.send(409);
-      res.end();
-    }
-  });
+  users.add(req, res);
 });
 
 //Обновляем пользователя по ID
 server.put("/api/users/:id", function(req, res) {
-  users.updateById(req.params.id, req.body, result => {
-    utils.sendResultOrCode(result, 520, res);
-  });
+  users.updateById(req, res);
 });
 
 //Удаляем пользователя
 server.del("/api/users/:id", function(req, res) {
-  users.deleteById([req.params.id], result => {
-    utils.sendResultOrCode(result, 520, res);
-  });
+  users.deleteById(req, res);
 });
 
 /*
@@ -111,9 +74,7 @@ server.del("/api/users/:id", function(req, res) {
 
 //Получаем все роли пользователей
 server.get("/api/roles", function(req, res) {
-  roles.getAll(result => {
-    utils.sendResultOrCode(result, 404, res);
-  });
+  roles.getAll(req, res);
 });
 
 /*
@@ -122,37 +83,27 @@ server.get("/api/roles", function(req, res) {
 
 //Получаем категорию по ID
 server.get("/api/categories/:id", function(req, res) {
-  categories.getById(req, req.params.id, result => {
-    utils.sendResultOrCode(result, 404, res);
-  });
+  categories.getById(req, res);
 });
 
 //Получаем все категории пользователя
 server.get("/api/categories", function(req, res) {
-  categories.getByUser(req, result => {
-    utils.sendResultOrCode(result, 404, res);
-  });
+  categories.getByUser(req, res);
 });
 
 //Добавляем категорию для пользователя
 server.post("/api/categories", function(req, res) {
-  categories.add(req, result => {
-    utils.sendResultOrCode(result, 400, res);
-  });
+  categories.add(req, res);
 });
 
 //Обновляем категорию по ID
 server.put("/api/categories/:id", function(req, res) {
-  categories.updateById(req, req.params.id, req.body, result => {
-    utils.sendResultOrCode(result, 520, res);
-  });
+  categories.updateById(req, res);
 });
 
 //Удаляем категорию пользователя
 server.del("/api/categories/:id", function(req, res) {
-  categories.deleteById(req, req.params.id, result => {
-    utils.sendResultOrCode(result, 520, res);
-  });
+  categories.deleteById(req, res);
 });
 
 /*
@@ -161,44 +112,32 @@ server.del("/api/categories/:id", function(req, res) {
 
 //Получаем задачу по ID
 server.get("/api/tasks/:id", function(req, res) {
-  tasks.getById(req, req.params.id, result => {
-    utils.sendResultOrCode(result, 404, res);
-  });
+  tasks.getById(req, res);
 });
 
 //Получаем все задачи пользователя
 server.get("/api/tasks", function(req, res) {
-  tasks.getByUser(req, result => {
-    utils.sendResultOrCode(result, 404, res);
-  });
+  tasks.getByUser(req, res);
 });
 
 //Получаем все задачи пользователя за определенную дату
 server.get("/api/tasks/date/:date", function(req, res) {
-  tasks.getByDate(req, req.params.date, result => {
-    utils.sendResultOrCode(result, 404, res);
-  });
+  tasks.getByDate(req, res);
 });
 
 //Добавляем задачу для пользователя
 server.post("/api/tasks", function(req, res) {
-  tasks.add(req, result => {
-    utils.sendResultOrCode(result, 400, res);
-  });
+  tasks.add(req, res);
 });
 
 //Обновляем задачу по ID
 server.put("/api/tasks/:id", function(req, res) {
-  tasks.updateById(req, req.body, result => {
-    utils.sendResultOrCode(result, 520, res);
-  });
+  tasks.updateById(req, res);
 });
 
 //Удаляем задачу пользователя
 server.del("/api/tasks/:id", function(req, res) {
-  tasks.deleteById(req, req.params.id, result => {
-    utils.sendResultOrCode(result, 520, res);
-  });
+  tasks.deleteById(req, res);
 });
 
 /*
@@ -207,37 +146,27 @@ server.del("/api/tasks/:id", function(req, res) {
 
 //Получаем статус по ID
 server.get("/api/task_statuses/:id", function(req, res) {
-  taskStatuses.getById(req, req.params.id, result => {
-    utils.sendResultOrCode(result, 404, res);
-  });
+  taskStatuses.getById(req, res);
 });
 
 //Получаем все статусы
 server.get("/api/task_statuses", function(req, res) {
-  taskStatuses.getAll(req, result => {
-    utils.sendResultOrCode(result, 404, res);
-  });
-});
-
-//Обновляем статус по ID
-server.put("/api/task_statuses/:id", function(req, res) {
-  taskStatuses.updateById(req, req.params.id, req.body, result => {
-    utils.sendResultOrCode(result, 520, res);
-  });
+  taskStatuses.getAll(req, res);
 });
 
 //Добавляем статус
 server.post("/api/task_statuses", function(req, res) {
-  taskStatuses.add(req, req.body, result => {
-    utils.sendResultOrCode(result, 400, res);
-  });
+  taskStatuses.add(req, res);
+});
+
+//Обновляем статус по ID
+server.put("/api/task_statuses/:id", function(req, res) {
+  taskStatuses.updateById(req, res);
 });
 
 //Удаляем статус
 server.del("/api/task_statuses/:id", function(req, res) {
-  taskStatuses.deleteById(req, req.params.id, result => {
-    utils.sendResultOrCode(result, 520, res);
-  });
+  taskStatuses.deleteById(req, res);
 });
 
 /*
@@ -246,9 +175,7 @@ server.del("/api/task_statuses/:id", function(req, res) {
 
 //Получаем все статусы задач
 server.get("/api/task_statuses_types", function(req, res) {
-  taskStatusesTypes.getAll(result => {
-    utils.sendResultOrCode(result, 404, res);
-  });
+  taskStatusesTypes.getAll(req, res);
 });
 
 /*
@@ -257,37 +184,27 @@ server.get("/api/task_statuses_types", function(req, res) {
 
 //Получаем весь лог
 server.get("/api/tasks_log", function(req, res) {
-  taskLog.getAll(req, result => {
-    utils.sendResultOrCode(result, 404, res);
-  });
+  taskLog.getAll(req, res);
 });
 
 //Получаем весь лог за определенную дату
 server.get("/api/tasks_log/date/:date", function(req, res) {
-  taskLog.getByDate(req, req.params.date, result => {
-    utils.sendResultOrCode(result, 404, res);
-  });
-});
-
-//Обновляем лог по ID
-server.put("/api/tasks_log/:id", function(req, res) {
-  taskLog.updateById(req.params.id, req.body, result => {
-    utils.sendResultOrCode(result, 520, res);
-  });
+  taskLog.getByDate(req, res);
 });
 
 //Добавляем лог
 server.post("/api/tasks_log", function(req, res) {
-  taskLog.add(req, result => {
-    utils.sendResultOrCode(result, 400, res);
-  });
+  taskLog.add(req, res);
+});
+
+//Обновляем лог по ID
+server.put("/api/tasks_log/:id", function(req, res) {
+  taskLog.updateById(req, res);
 });
 
 //Удаляем лог
 server.del("/api/tasks_log/:id", function(req, res) {
-  taskLog.deleteById([req.params.id], result => {
-    utils.sendResultOrCode(result, 520, res);
-  });
+  taskLog.deleteById(req, res);
 });
 
 /*
@@ -296,19 +213,10 @@ server.del("/api/tasks_log/:id", function(req, res) {
 
 //Получаем время исполнения по всем категориям
 server.get("/api/categories/time_execution/all", function(req, res) {
-  categories.getTimeExecutionForAll(req, result => {
-    utils.sendResultOrCode(result, 404, res);
-  });
+  statistics.getCategoriesExecutionTimeForAll(req, res);
 });
 
 //Получаем время исполнения задач по конкретному периоду
 server.get("/api/tasks/statistic/period/:dateFrom/:dateTo", function(req, res) {
-  statistics.getTasksExecutionTimeByPeriod(
-    req,
-    req.params.dateFrom,
-    req.params.dateTo,
-    result => {
-      utils.sendResultOrCode(result, 404, res);
-    }
-  );
+  statistics.getTasksExecutionTimeByPeriod(req, res);
 });

@@ -1,50 +1,61 @@
 const tokens = require("./tokens.js");
 const taskLog = require("./taskLog.js");
 const config = require("../config");
+const utils = require("./utils.js");
 
 var connection = config.db.get;
 
 //Получаем задачу по ID
-var getById = (req, taskId, callback) => {
+var getById = (req, res) => {
+  let id = req.params.id;
   let user = tokens.getUserFromHeaders(req);
+
   connection.query(
-    "select t.id, t.user_id, t.name, t.description, c.name category_name, t.category_id, ts.name status_name, t.status_id" +
+    "select " +
+      " t.id, " +
+      " t.user_id, " +
+      " t.name, " +
+      " t.description, " +
+      " c.name category_name, " +
+      " t.category_id," +
+      " ts.name status_name, " +
+      " t.status_id" +
       " from tasks t, categories c, task_statuses ts" +
       " where t.category_id = c.id and t.status_id = ts.id and t.id=? and t.user_id =?",
-    [taskId, user.id],
+    [id, user.id],
     function(error, results) {
-      if (error) throw error;
-      try {
-        callback(results);
-      } catch {
-        callback(null);
-      }
+      utils.sendResultOrCode(error, results, res, 404);
     }
   );
 };
 
 //Получаем все задачи пользователя
-var getByUser = (req, callback) => {
+var getByUser = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
+
   connection.query(
-    "select t.id, t.user_id, t.name, t.description, c.name category_name, t.category_id, ts.name status_name, t.status_id" +
+    "select " +
+      " t.id," +
+      " t.user_id," +
+      " t.name, " +
+      " t.description, " +
+      " c.name category_name, " +
+      " t.category_id, " +
+      " ts.name status_name, " +
+      " t.status_id" +
       " from tasks t, categories c, task_statuses ts" +
       " where t.category_id = c.id and t.status_id = ts.id and t.user_id =?",
     [user.id],
     function(error, results) {
-      if (error) throw error;
-      try {
-        callback(results);
-      } catch {
-        callback(null);
-      }
+      utils.sendResultOrCode(error, results, res, 404);
     }
   );
 };
 
 //Получаем все задачи пользователя по дате
-var getByDate = (req, date, callback) => {
+var getByDate = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
+  let date = req.params.date;
 
   connection.query(
     //Здесь какая логика. Получаем задачи, который были заведены в указанную дату
@@ -113,38 +124,30 @@ var getByDate = (req, date, callback) => {
       "  order by 1 desc", //Сортируем по ID
     [date, date, user.id, date, user.id, date, user.id, date],
     function(error, results) {
-      if (error) throw error;
-      try {
-        callback(results);
-      } catch {
-        callback(null);
-      }
+      utils.sendResultOrCode(error, results, res, 404);
     }
   );
 };
 
 //Добавляем задачу
-var add = (req, callback) => {
+var add = (req, res) => {
+  //Соберем таску
   let task = {};
   let user = tokens.getUserFromHeaders(req);
-
   Object.assign(task, { user_id: user.id }, req.body);
 
-  connection.query("INSERT INTO tasks SET ?", task, function(error, results) {
-    if (error) throw error;
-    try {
-      callback(results);
-    } catch {
-      callback(error);
-    }
+  connection.query("insert into tasks set ?", task, function(error, results) {
+    utils.sendResultOrCode(error, results, res, 400);
   });
 };
 
 //Обновляем задачу по ID
-var updateById = (req, task, callback) => {
+var updateById = (req, res) => {
+  let task = req.body;
   let user = tokens.getUserFromHeaders(req);
+
   connection.query(
-    "UPDATE tasks SET `category_id`=?, `status_id`=?, `name`=?, `description`=? Where id=? and user_id =?",
+    "update tasks set category_id=?, status_id=?, name=?, description=? where id=? and user_id =?",
     [
       task.category_id,
       task.status_id,
@@ -154,32 +157,23 @@ var updateById = (req, task, callback) => {
       user.id
     ],
     function(error, results) {
-      if (error) throw error;
-      try {
-        callback(results);
-      } catch {
-        callback(error);
-      }
+      utils.sendResultOrCode(error, results, res, 520);
     }
   );
 };
 
 //Удаляем задачу по ID
-var deleteById = (req, taskId, callback) => {
+var deleteById = (req, res) => {
+  let id = req.params.id;
   let user = tokens.getUserFromHeaders(req);
 
-  taskLog.deleteByTaskId(taskId, success => {
+  taskLog.deleteByTaskId(id, success => {
     if (success) {
       connection.query(
-        "DELETE FROM tasks WHERE id=? and user_id=?",
-        [taskId, user.id],
-        function(error) {
-          if (error) throw error;
-          try {
-            callback("{success}");
-          } catch {
-            callback("{error}");
-          }
+        "delete from tasks where id=? and user_id=?",
+        [id, user.id],
+        function(error, results) {
+          utils.sendResultOrCode(error, results, res, 520);
         }
       );
     } else {

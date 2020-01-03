@@ -1,18 +1,14 @@
 const config = require("../config");
+const utils = require("./utils.js");
 
 var connection = config.db.get;
 
 //Получаем все роли
-var getAll = callback => {
+var getAll = (req, res) => {
   connection.query(
     "select r.id, r.name, r.description" + " from roles r",
     function(error, results) {
-      if (error) throw error;
-      try {
-        callback(results);
-      } catch {
-        callback(error);
-      }
+      utils.sendResultOrCode(error, results, res, 404);
     }
   );
 };

@@ -1,9 +1,11 @@
-var sendResultOrCode = function(result, code, res) {
-  if (!result) {
-    res.send(code);
-    res.end();
-  } else {
-    res.end(JSON.stringify(result));
+//Отправляем результат или код
+var sendResultOrCode = function(error, result, response, code) {
+  if (error) throw error;
+  try {
+    response.end(JSON.stringify(result));
+  } catch {
+    response.send(code);
+    response.end();
   }
 };
 

@@ -1,4 +1,5 @@
 const config = require("../config");
+const utils = require("./utils.js");
 
 var connection = config.db.get;
 
@@ -37,76 +38,85 @@ var getByEmailPassword = (req, callback) => {
 };
 
 //Получаем пользователя по ID
-var getById = (userId, callback) => {
+var getById = (req, res) => {
+  let id = req.params.id;
+
   connection.query(
     "select u.id, u.email, u.password, r.name role" +
       " from users u, roles r " +
       " where u.role_id = r.id and u.id=?",
-    [userId],
+    [id],
     function(error, results) {
-      if (error) throw error;
-      try {
-        callback(results);
-      } catch {
-        callback(null);
-      }
+      utils.sendResultOrCode(error, results, res, 404);
     }
   );
 };
 
 //Получаем всех пользователей
-var getAll = callback => {
+var getAll = (req, res) => {
   connection.query(
     "select u.id, u.email, u.role_id, r.name role" +
       " from users u, roles r" +
       " where u.role_id = r.id",
     function(error, results) {
-      if (error) throw error;
-      try {
-        callback(results);
-      } catch {
-        callback(null);
-      }
+      utils.sendResultOrCode(error, results, res, 404);
     }
   );
 };
 
 //Добавляем пользователя
-var add = (user, callback) => {
-  connection.query("insert into users set ?", user, function(error, results) {
-    if (error) throw error;
-    try {
-      callback(results);
-    } catch {
-      callback(error);
+var add = (req, res) => {
+  //Но сначала проверям, что такого email еще нет в базе
+  getByEmail(req, user => {
+    if (!user) {
+      connection.query("insert into users set ?", req.body, function(
+        error,
+        results
+      ) {
+        utils.sendResultOrCode(error, results, res, 409);
+      });
+    } else {
+      res.send(409);
+      res.end();
     }
   });
 };
 
 //Обновляем пользователя по ID
-var updateById = (userId, user, callback) => {
-  connection.query(
-    "update users set email=?, role_id=? Where id=?",
-    [user.email, user.role_id, userId],
-    function(error, results) {
-      if (error) throw error;
-      try {
-        callback(results);
-      } catch {
-        callback(error);
+var updateById = (req, res) => {
+  let userId = req.params.id;
+  let user = req.body;
+
+  //Два возможных варианта обновления, с ролью и без
+  //Роль можно обновить в админке, но пользователь обновить её не может
+  if (typeof user.role_id === "undefined") {
+    connection.query(
+      "update users set email=? where id=?",
+      [user.email, userId],
+      function(error, results) {
+        utils.sendResultOrCode(error, results, res, 520);
       }
-    }
-  );
+    );
+  } else {
+    connection.query(
+      "update users set email=?, role_id=? Where id=?",
+      [user.email, user.role_id, userId],
+      function(error, results) {
+        utils.sendResultOrCode(error, results, res, 520);
+      }
+    );
+  }
 };
 
 //Удаляем пользователя по ID
-var deleteById = (userId, callback) => {
-  connection.query("delete from users where id=?", [userId], function(error) {
-    try {
-      callback("{success}");
-    } catch {
-      callback("{error}");
-    }
+var deleteById = (req, res) => {
+  let userId = req.params.id;
+
+  connection.query("delete from users where id=?", [userId], function(
+    error,
+    results
+  ) {
+    utils.sendResultOrCode(error, results, res, 520);
   });
 };
 

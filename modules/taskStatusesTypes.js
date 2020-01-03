@@ -1,19 +1,15 @@
-const tokens = require("./tokens.js");
+const utils = require("./utils.js");
 const config = require("../config");
 
 var connection = config.db.get;
 
 //Получаем все типы статусов
-var getAll = callback => {
+var getAll = (req, res) => {
   connection.query("select * from task_statuses_types", function(
     error,
     results
   ) {
-    try {
-      callback(results);
-    } catch {
-      callback(error);
-    }
+    utils.sendResultOrCode(error, results, res, 404);
   });
 };
 
