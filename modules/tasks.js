@@ -63,7 +63,11 @@ var getByDate = (req, res) => {
     "  (select SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time " +
     "   from task_log tl " +
     "  where tl.task_id = t.id" +
-    "  and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') = ?) execution_time" +
+    "  and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') = ?) execution_time_day," +
+    "  (select SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time " +
+    "   from task_log tl " +
+    "  where tl.task_id = t.id" +
+    "  and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') <= ?) execution_time_to_day" +
     "  from (" +
     " select t.id," +
     "  t.user_id, " +
@@ -122,7 +126,7 @@ var getByDate = (req, res) => {
       "              limit 1)" +
       " ) t" +
       "  order by 1 desc", //Сортируем по ID
-    [date, date, user.id, date, user.id, date, user.id, date],
+    [date, date, date, user.id, date, user.id, date, user.id, date],
     function(error, results) {
       utils.sendResultOrCode(error, results, res, 404);
     }
