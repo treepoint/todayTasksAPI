@@ -71,7 +71,7 @@ var updateById = (req, res) => {
       taskLog.task_id,
       " " + taskLog.execution_start,
       " " + taskLog.execution_end,
-      id
+      taskLog.id
     ],
     function(error, results) {
       utils.sendResultOrCode(error, results, res, 520);
