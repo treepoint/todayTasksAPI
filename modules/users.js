@@ -3,7 +3,7 @@ const utils = require("./utils.js");
 
 var connection = config.db.get;
 
-//Получаем по email. Требуется чтобы проверить введенные данные при авторизации
+//Получаем по email. Требуется чтобы отсечь дубли при регистрации
 var getByEmail = (req, callback) => {
   connection.query(
     "select * from users where `email`=?",

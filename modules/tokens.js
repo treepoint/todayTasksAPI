@@ -4,7 +4,12 @@ const jwt = require("jsonwebtoken");
 var createToken = function(user, secret, expiresIn) {
   //Генерируем токен
   let value = jwt.sign(
-    { id: user.id, email: user.email, password: user.password },
+    {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      password: user.password
+    },
     secret,
     {
       expiresIn: expiresIn
@@ -75,9 +80,9 @@ var getUserFromHeaders = req => {
 
 //Получаем пользователя из токена
 var getUserFromToken = tokenValue => {
-  let { id, email, password } = jwt.decode(tokenValue);
+  let { id, email, role, password } = jwt.decode(tokenValue);
 
-  let user = { id, email, password };
+  let user = { id, email, role, password };
 
   return user;
 };
