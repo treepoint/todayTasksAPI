@@ -100,9 +100,9 @@ server.put("/api/categories/:id", function(req, res) {
   categories.updateById(req, res);
 });
 
-//Удаляем категорию пользователя
+//Закрываем категорию пользователя
 server.del("/api/categories/:id", function(req, res) {
-  categories.deleteById(req, res);
+  categories.closeById(req, res);
 });
 
 /*
@@ -163,9 +163,9 @@ server.put("/api/task_statuses/:id", function(req, res) {
   taskStatuses.updateById(req, res);
 });
 
-//Удаляем статус
+//Закрываем статус
 server.del("/api/task_statuses/:id", function(req, res) {
-  taskStatuses.deleteById(req, res);
+  taskStatuses.closeById(req, res);
 });
 
 /*

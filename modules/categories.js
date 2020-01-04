@@ -23,8 +23,8 @@ var getByUser = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "select * from categories where user_id =?",
-    [user.id],
+    "select * from categories where user_id = ? and (close_date < ? or close_date is null)",
+    [user.id, utils.getCurrentDate()],
     function(error, results) {
       utils.sendResultOrCode(error, results, res, 404);
     }
@@ -36,11 +36,12 @@ var add = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "INSERT INTO categories SET ?",
+    "insert into categories set ?",
     {
       user_id: user.id,
       name: req.body.name,
-      description: req.body.description
+      description: req.body.description,
+      create_date: utils.getCurrentDate()
     },
     function(error, results) {
       utils.sendResultOrCode(error, results, res, 400);
@@ -63,14 +64,14 @@ var updateById = (req, res) => {
   );
 };
 
-//Удаляем категорию по ID
-var deleteById = (req, res) => {
+//Закрываем категорию по ID
+var closeById = (req, res) => {
   let id = req.params.id;
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "delete from categories where id=? and user_id=?",
-    [id, user.id],
+    "update categories set close_date=? where id=? and user_id = ?",
+    [utils.getCurrentDate(), id, user.id],
     function(error, results) {
       utils.sendResultOrCode(error, results, res, 520);
     }
@@ -81,4 +82,4 @@ module.exports.getById = getById;
 module.exports.getByUser = getByUser;
 module.exports.add = add;
 module.exports.updateById = updateById;
-module.exports.deleteById = deleteById;
+module.exports.closeById = closeById;

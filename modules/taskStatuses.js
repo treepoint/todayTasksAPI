@@ -23,8 +23,8 @@ var getAll = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "select * from task_statuses where user_id = ?",
-    user.id,
+    "select * from task_statuses where user_id = ? and (close_date < ? or close_date is null)",
+    [user.id, utils.getCurrentDate()],
     function(error, results) {
       utils.sendResultOrCode(error, results, res, 404);
     }
@@ -38,7 +38,12 @@ var add = (req, res) => {
 
   connection.query(
     "insert into task_statuses set ?",
-    { name: status.name, type_id: status.type_id, user_id: user.id },
+    {
+      name: status.name,
+      type_id: status.type_id,
+      user_id: user.id,
+      create_date: utils.getCurrentDate()
+    },
     function(error, results) {
       utils.sendResultOrCode(error, results, res, 400);
     }
@@ -60,14 +65,14 @@ var updateById = (req, res) => {
   );
 };
 
-//Удаляем пользователя по ID
-var deleteById = (req, res) => {
+//Закрываем статус по ID
+var closeById = (req, res) => {
   let id = req.params.id;
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "delete from task_statuses where id=? and user_id = ?",
-    [id, user.id],
+    "update task_statuses set close_date=? where id=? and user_id = ?",
+    [utils.getCurrentDate(), id, user.id],
     function(error, results) {
       utils.sendResultOrCode(error, results, res, 520);
     }
@@ -78,4 +83,4 @@ module.exports.getById = getById;
 module.exports.getAll = getAll;
 module.exports.add = add;
 module.exports.updateById = updateById;
-module.exports.deleteById = deleteById;
+module.exports.closeById = closeById;

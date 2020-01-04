@@ -9,4 +9,15 @@ var sendResultOrCode = function(error, result, response, code) {
   }
 };
 
+//Получить текущую дату
+var getCurrentDate = function() {
+  var formatDate = new Date();
+  var dd = String(formatDate.getDate()).padStart(2, "0");
+  var mm = String(formatDate.getMonth() + 1).padStart(2, "0");
+  var yyyy = formatDate.getFullYear();
+
+  return yyyy + "-" + mm + "-" + dd;
+};
+
 module.exports.sendResultOrCode = sendResultOrCode;
+module.exports.getCurrentDate = getCurrentDate;
