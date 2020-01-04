@@ -23,8 +23,8 @@ var getAll = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "select * from task_statuses where user_id = ? and (close_date < ? or close_date is null)",
-    [user.id, utils.getCurrentDate()],
+    "select * from task_statuses where user_id = ?",
+    [user.id],
     function(error, results) {
       utils.sendResultOrCode(error, results, res, 404);
     }
