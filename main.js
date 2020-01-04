@@ -219,3 +219,11 @@ server.get("/api/categories/time_execution/all", function(req, res) {
 server.get("/api/tasks/statistic/period/:dateFrom/:dateTo", function(req, res) {
   statistics.getTasksExecutionTimeByPeriod(req, res);
 });
+
+//Получаем время исполнения задач по конкретному периоду
+server.get("/api/categories/statistic/period/:dateFrom/:dateTo", function(
+  req,
+  res
+) {
+  statistics.getCategoriesExecutionTimeByPeriod(req, res);
+});

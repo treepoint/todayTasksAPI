@@ -28,6 +28,31 @@ var getTasksExecutionTimeByPeriod = (req, res) => {
   );
 };
 
+//Получаем время исполнения задач по категориям по конкретному периоду
+var getCategoriesExecutionTimeByPeriod = (req, res) => {
+  let dateFrom = req.params.dateFrom;
+  let dateTo = req.params.dateTo;
+
+  let user = tokens.getUserFromHeaders(req);
+
+  connection.query(
+    "select" +
+      " c.name," +
+      " SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time" +
+      " from task_log tl, tasks t, categories c" +
+      " where tl.task_id = t.id" +
+      " and t.user_id = ?" +
+      " and t.category_id = c.id" +
+      " and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') BETWEEN ? and ?" +
+      " and tl.execution_start < tl.execution_end" +
+      " group by c.name",
+    [user.id, dateFrom, dateTo],
+    function(error, results) {
+      utils.sendResultOrCode(error, results, res, 404);
+    }
+  );
+};
+
 //Получаем время исполнения по категориям
 var getCategoriesExecutionTimeForAll = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
@@ -53,4 +78,5 @@ var getCategoriesExecutionTimeForAll = (req, res) => {
 };
 
 module.exports.getTasksExecutionTimeByPeriod = getTasksExecutionTimeByPeriod;
+module.exports.getCategoriesExecutionTimeByPeriod = getCategoriesExecutionTimeByPeriod;
 module.exports.getCategoriesExecutionTimeForAll = getCategoriesExecutionTimeForAll;
