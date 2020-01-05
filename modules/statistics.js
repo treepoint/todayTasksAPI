@@ -14,10 +14,12 @@ var getTasksExecutionTimeByPeriod = (req, res) => {
   connection.query(
     "select" +
       " t.name," +
+      " c.name category_name," +
       " SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time" +
-      " from task_log tl, tasks t" +
+      " from task_log tl, tasks t, categories c" +
       " where tl.task_id = t.id" +
       "   and t.user_id = ?" +
+      "   and t.category_id = c.id" +
       "   and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') BETWEEN ? and ?" +
       "   and tl.execution_start < tl.execution_end" +
       " group by t.id, t.name ",
