@@ -125,7 +125,7 @@ var getByDate = (req, res) => {
       "                and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') = ?" +
       "              limit 1)" +
       " ) t" +
-      "  order by 1 desc", //Сортируем по ID
+      "  order by 1 asc", //Сортируем по ID
     [date, date, date, user.id, date, user.id, date, user.id, date],
     function(error, results) {
       utils.sendResultOrCode(error, results, res, 404);
