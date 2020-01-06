@@ -23,7 +23,7 @@ var getAll = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "select * from task_statuses where user_id = ?",
+    "select ts.* from task_statuses ts where ts.user_id = ? order by ts.type_id, ts.id asc",
     [user.id],
     function(error, results) {
       utils.sendResultOrCode(error, results, res, 404);
