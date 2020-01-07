@@ -15,6 +15,7 @@ var getById = (req, res) => {
       " t.id, " +
       " t.user_id, " +
       " t.name, " +
+      " t.name_style, " +
       " t.description, " +
       " c.name category_name, " +
       " t.category_id," +
@@ -74,7 +75,6 @@ var getByDate = (req, res) => {
     "  t.name, " +
     "  t.name_style, " +
     "  t.description, " +
-    "  t.description_style, " +
     "  c.name category_name, " +
     "  t.category_id, " +
     "  ts.name status_name, " +
@@ -93,7 +93,6 @@ var getByDate = (req, res) => {
     "  t.name, " +
     "  t.name_style, " +
     "  t.description, " +
-    "  t.description_style, " +
     "  c.name category_name, " +
     "  t.category_id, " +
     "  ts.name status_name, " +
@@ -113,7 +112,6 @@ var getByDate = (req, res) => {
       " t.name, " +
       " t.name_style, " +
       " t.description, " +
-      " t.description_style, " +
       " c.name category_name, " +
       " t.category_id, " +
       " ts.name status_name, " +
@@ -157,14 +155,13 @@ var updateById = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "update tasks set category_id=?, status_id=?, name=?, name_style=?, description=?, description_style=? where id=? and user_id =?",
+    "update tasks set category_id=?, status_id=?, name=?, name_style=?, description=? where id=? and user_id =?",
     [
       task.category_id,
       task.status_id,
       task.name,
       JSON.stringify(task.name_style),
       task.description,
-      JSON.stringify(task.description_style),
       task.id,
       user.id
     ],
