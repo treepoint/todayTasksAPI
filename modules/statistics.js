@@ -14,7 +14,9 @@ var getTasksExecutionTimeByPeriod = (req, res) => {
   connection.query(
     "select" +
       " t.name," +
+      " t.name_style," +
       " c.name category_name," +
+      " c.name_style category_name_style," +
       " SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time" +
       " from task_log tl, tasks t, categories c" +
       " where tl.task_id = t.id" +
@@ -25,7 +27,15 @@ var getTasksExecutionTimeByPeriod = (req, res) => {
       " group by t.id, t.name ",
     [user.id, dateFrom, dateTo],
     function(error, results) {
-      utils.sendResultOrCode(error, results, res, 404);
+      //Преобразуем стили в объект
+      let result = results.map(item => {
+        item.name_style = JSON.parse(item.name_style);
+        item.category_name_style = JSON.parse(item.category_name_style);
+
+        return item;
+      });
+
+      utils.sendResultOrCode(error, result, res, 404);
     }
   );
 };
@@ -40,6 +50,7 @@ var getCategoriesExecutionTimeByPeriod = (req, res) => {
   connection.query(
     "select" +
       " c.name," +
+      " c.name_style," +
       " SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time" +
       " from task_log tl, tasks t, categories c" +
       " where tl.task_id = t.id" +
@@ -50,7 +61,14 @@ var getCategoriesExecutionTimeByPeriod = (req, res) => {
       " group by c.name",
     [user.id, dateFrom, dateTo],
     function(error, results) {
-      utils.sendResultOrCode(error, results, res, 404);
+      //Преобразуем стили в объект
+      let result = results.map(item => {
+        item.name_style = JSON.parse(item.name_style);
+
+        return item;
+      });
+
+      utils.sendResultOrCode(error, result, res, 404);
     }
   );
 };
@@ -60,8 +78,9 @@ var getCategoriesExecutionTimeForAll = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "select category_name name, SUM(execution_time) execution_time  from" +
-      " (select c.name category_name, " +
+    "select name, name_style, SUM(execution_time) execution_time  from" +
+      " (select c.name name, " +
+      "         c.name_style name_style, " +
       "         TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end) execution_time" +
       " from task_log tl," +
       " tasks t," +
@@ -74,7 +93,14 @@ var getCategoriesExecutionTimeForAll = (req, res) => {
       " group by 1",
     [user.id],
     function(error, results) {
-      utils.sendResultOrCode(error, results, res, 404);
+      //Преобразуем стили в объект
+      let result = results.map(item => {
+        item.name_style = JSON.parse(item.name_style);
+
+        return item;
+      });
+
+      utils.sendResultOrCode(error, result, res, 404);
     }
   );
 };
