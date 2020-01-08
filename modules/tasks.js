@@ -86,7 +86,7 @@ var getByDate = (req, res) => {
     "   and t.status_id = ts.id " +
     "   and DATE_FORMAT(t.create_date,'%Y-%m-%d') = ? " +
     "   and t.user_id =? " +
-    //Потом получаем задачи, у которых тип статуса не «завершено»
+    //Потом получаем задачи, у которых тип статуса не «завершено» или которые были обновлены в этот день
     " union  " +
     " select t.id, " +
     "  t.user_id, " +
@@ -104,7 +104,7 @@ var getByDate = (req, res) => {
     "   and t.status_id = ts.id " +
     "   and DATE_FORMAT(t.create_date,'%Y-%m-%d') <= ? " +
     "   and t.user_id = ?" +
-    "   and ts.type_id !=2" + //Не завершено
+    "   and (ts.type_id !=2 or DATE_FORMAT(t.update_date,'%Y-%m-%d') = ?)  " + //Не завершено
       //И все задачи, по которым были записи в этот день
       " union " +
       " select t.id, " +
@@ -130,7 +130,7 @@ var getByDate = (req, res) => {
       "              limit 1)" +
       " ) t" +
       "  order by 1 asc", //Сортируем по ID
-    [date, date, date, user.id, date, user.id, date, user.id, date],
+    [date, date, date, user.id, date, user.id, date, date, user.id, date],
 
     //Преобразуем стили в объект
     function(error, results) {
@@ -147,9 +147,10 @@ var getByDate = (req, res) => {
 
 //Добавляем задачу
 var add = (req, res) => {
+  let user = tokens.getUserFromHeaders(req);
+
   //Соберем таску
   let task = {};
-  let user = tokens.getUserFromHeaders(req);
   Object.assign(task, { user_id: user.id }, req.body);
 
   connection.query("insert into tasks set ?", task, function(error, results) {
@@ -163,13 +164,14 @@ var updateById = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "update tasks set category_id=?, status_id=?, name=?, name_style=?, description=? where id=? and user_id =?",
+    "update tasks set category_id=?, status_id=?, name=?, name_style=?, description=?, update_date =? where id=? and user_id =?",
     [
       task.category_id,
       task.status_id,
       task.name,
       JSON.stringify(task.name_style),
       task.description,
+      utils.getCurrentDateTime(),
       task.id,
       user.id
     ],

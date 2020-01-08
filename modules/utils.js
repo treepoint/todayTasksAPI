@@ -19,5 +19,20 @@ var getCurrentDate = function() {
   return yyyy + "-" + mm + "-" + dd;
 };
 
+//Получить текущую дату и время
+var getCurrentDateTime = function() {
+  var date = new Date();
+
+  var dd = String(date.getDate()).padStart(2, "0");
+  var mm = String(date.getMonth() + 1).padStart(2, "0");
+  var yyyy = date.getFullYear();
+
+  var hh = date.getHours();
+  var MM = date.getMinutes();
+
+  return yyyy + "-" + mm + "-" + dd + " " + MM + ":" + hh;
+};
+
 module.exports.sendResultOrCode = sendResultOrCode;
 module.exports.getCurrentDate = getCurrentDate;
+module.exports.getCurrentDateTime = getCurrentDateTime;
