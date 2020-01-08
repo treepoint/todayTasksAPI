@@ -131,8 +131,16 @@ var getByDate = (req, res) => {
       " ) t" +
       "  order by 1 asc", //Сортируем по ID
     [date, date, date, user.id, date, user.id, date, user.id, date],
+
+    //Преобразуем стили в объект
     function(error, results) {
-      utils.sendResultOrCode(error, results, res, 404);
+      let result = results.map(item => {
+        item.name_style = JSON.parse(item.name_style);
+
+        return item;
+      });
+
+      utils.sendResultOrCode(error, result, res, 404);
     }
   );
 };

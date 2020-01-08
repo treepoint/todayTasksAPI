@@ -13,7 +13,14 @@ var getById = (req, res) => {
     "select * from categories where id=? and user_id =?",
     [id, user.id],
     function(error, results) {
-      utils.sendResultOrCode(error, results, res, 404);
+      //Преобразуем стили в объект
+      let result = results.map(item => {
+        item.name_style = JSON.parse(item.name_style);
+
+        return item;
+      });
+
+      utils.sendResultOrCode(error, result, res, 404);
     }
   );
 };
@@ -26,21 +33,30 @@ var getByUser = (req, res) => {
     "select * from categories where user_id = ?",
     [user.id],
     function(error, results) {
-      utils.sendResultOrCode(error, results, res, 404);
+      //Преобразуем стили в объект
+      let result = results.map(item => {
+        item.name_style = JSON.parse(item.name_style);
+
+        return item;
+      });
+
+      utils.sendResultOrCode(error, result, res, 404);
     }
   );
 };
 
 //Добавляем категорию
 var add = (req, res) => {
+  let category = req.body;
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
     "insert into categories set ?",
     {
       user_id: user.id,
-      name: req.body.name,
-      description: req.body.description,
+      name: category.name,
+      name_style: category.name_style,
+      description: category.description,
       create_date: utils.getCurrentDate()
     },
     function(error, results) {

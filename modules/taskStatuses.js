@@ -13,7 +13,14 @@ var getById = (req, res) => {
     "select * from task_statuses where id=? and user_id = ?",
     [id, user.id],
     function(error, results) {
-      utils.sendResultOrCode(error, results, res, 404);
+      //Преобразуем стили в объект
+      let result = results.map(item => {
+        item.name_style = JSON.parse(item.name_style);
+
+        return item;
+      });
+
+      utils.sendResultOrCode(error, result, res, 404);
     }
   );
 };
@@ -26,7 +33,14 @@ var getAll = (req, res) => {
     "select ts.* from task_statuses ts where ts.user_id = ? order by ts.type_id, ts.id asc",
     [user.id],
     function(error, results) {
-      utils.sendResultOrCode(error, results, res, 404);
+      //Преобразуем стили в объект
+      let result = results.map(item => {
+        item.name_style = JSON.parse(item.name_style);
+
+        return item;
+      });
+
+      utils.sendResultOrCode(error, result, res, 404);
     }
   );
 };
@@ -40,6 +54,7 @@ var add = (req, res) => {
     "insert into task_statuses set ?",
     {
       name: status.name,
+      name_style: status.name_style,
       type_id: status.type_id,
       user_id: user.id,
       create_date: utils.getCurrentDate()
