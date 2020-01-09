@@ -93,7 +93,7 @@ var getByDate = (req, res) => {
       "   where tl.task_id = t.id" +
       "             and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') = ?" +
       "  limit 1))" +
-      " and t.user_id = 1 " +
+      " and t.user_id = ? " +
       " order by 1 asc", //Сортируем по ID
     [date, date, date, date, date, user.id],
 
