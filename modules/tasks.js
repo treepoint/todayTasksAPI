@@ -64,10 +64,12 @@ var getByDate = (req, res) => {
     "  (select SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time " +
     "   from task_log tl " +
     "  where tl.task_id = t.id" +
+    "  and tl.execution_start < tl.execution_end" +
     "  and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') = ?) execution_time_day," +
     "  (select SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time " +
     "   from task_log tl " +
     "  where tl.task_id = t.id" +
+    "  and tl.execution_start < tl.execution_end" +
     "  and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') <= ?) execution_time_to_day" +
     "  from (" +
     " select t.id," +
