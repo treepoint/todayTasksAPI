@@ -30,7 +30,7 @@ var getCurrentDateTime = function() {
   var hh = date.getHours();
   var MM = date.getMinutes();
 
-  return yyyy + "-" + mm + "-" + dd + " " + MM + ":" + hh;
+  return yyyy + "-" + mm + "-" + dd + " " + hh + ":" + MM;
 };
 
 module.exports.sendResultOrCode = sendResultOrCode;
