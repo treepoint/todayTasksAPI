@@ -36,7 +36,8 @@ var getByDate = (req, res) => {
       " DATE_FORMAT(tl.execution_start,'%H:%i') execution_start, " +
       " DATE_FORMAT(tl.execution_end,'%H:%i') execution_end," +
       " TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end) execution_time" +
-      " from task_log tl, tasks t where tl.task_id = t.id and t.user_id =? and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') = ? ",
+      " from task_log tl, tasks t where tl.task_id = t.id and t.user_id =? and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') = ? " +
+      " order by tl.id desc",
     [user.id, date],
     function(error, results) {
       utils.sendResultOrCode(error, results, res, 404);
