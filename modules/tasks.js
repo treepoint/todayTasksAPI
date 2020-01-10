@@ -84,9 +84,9 @@ var getByDate = (req, res) => {
       " where t.category_id = c.id " +
       " and t.status_id = ts.id " +
       //Получаем задачи, который были заведены в указанную дату
-      " and (DATE_FORMAT(t.create_date,'%Y-%m-%d') = ? or " +
+      " and (DATE_FORMAT(t.create_date,'%Y-%m-%d') <= ?) " +
       //Или все еще не завершены или были обновлены в указанный день
-      "   (ts.type_id !=2 or DATE_FORMAT(t.update_date,'%Y-%m-%d') = ?) or " +
+      " and ((ts.type_id !=2 or DATE_FORMAT(t.update_date,'%Y-%m-%d') = ?) or " +
       //Или по ним были записи в этот день
       "  exists (select * " +
       "            from task_log tl" +
