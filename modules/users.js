@@ -87,25 +87,33 @@ var updateById = (req, res) => {
   let userId = req.params.id;
   let user = req.body;
 
-  //Два возможных варианта обновления, с ролью и без
-  //Роль можно обновить в админке, но пользователь обновить её не может
-  if (typeof user.role_id === "undefined") {
-    connection.query(
-      "update users set email=? where id=?",
-      [user.email, userId],
-      function(error, results) {
-        utils.sendResultOrCode(error, results, res, 520);
+  //Но сначала проверям, что такого email еще нет в базе
+  getByEmail(req, isExists => {
+    if (!isExists) {
+      //Два возможных варианта обновления, с ролью и без
+      //Роль можно обновить в админке, но пользователь обновить её не может
+      if (typeof user.role_id === "undefined") {
+        connection.query(
+          "update users set email=? where id=?",
+          [user.email, userId],
+          function(error, results) {
+            utils.sendResultOrCode(error, results, res, 520);
+          }
+        );
+      } else {
+        connection.query(
+          "update users set email=?, role_id=? Where id=?",
+          [user.email, user.role_id, userId],
+          function(error, results) {
+            utils.sendResultOrCode(error, results, res, 520);
+          }
+        );
       }
-    );
-  } else {
-    connection.query(
-      "update users set email=?, role_id=? Where id=?",
-      [user.email, user.role_id, userId],
-      function(error, results) {
-        utils.sendResultOrCode(error, results, res, 520);
-      }
-    );
-  }
+    } else {
+      res.send(409);
+      res.end();
+    }
+  });
 };
 
 //Удаляем пользователя по ID
