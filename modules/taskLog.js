@@ -12,6 +12,7 @@ var getAll = (req, res) => {
       " tl.id, " +
       " tl.task_id, " +
       " t.name task_name, " +
+      " tl.comment," +
       " DATE_FORMAT(tl.execution_start,'%H:%i') execution_start, " +
       " DATE_FORMAT(tl.execution_end,'%H:%i') execution_end," +
       " TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end) execution_time" +
@@ -33,6 +34,7 @@ var getByDate = (req, res) => {
       " tl.id, " +
       " tl.task_id, " +
       " t.name task_name," +
+      " tl.comment," +
       " DATE_FORMAT(tl.execution_start,'%H:%i') execution_start, " +
       " DATE_FORMAT(tl.execution_end,'%H:%i') execution_end," +
       " TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end) execution_time" +
@@ -65,11 +67,13 @@ var updateById = (req, res) => {
     "update task_log " +
       " set  " +
       " task_id=?,  " +
+      " comment=?,  " +
       " execution_start=CONCAT(DATE(execution_start),  ?),  " +
       " execution_end=CONCAT(DATE(execution_end),  ?)  " +
       " where id=?",
     [
       taskLog.task_id,
+      taskLog.comment,
       " " + taskLog.execution_start,
       " " + taskLog.execution_end,
       taskLog.id
