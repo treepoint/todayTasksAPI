@@ -136,7 +136,7 @@ var updateById = (req, res) => {
       task.name,
       JSON.stringify(task.name_style),
       task.description,
-      utils.getCurrentDateTime(),
+      task.update_date,
       task.id,
       user.id
     ],
