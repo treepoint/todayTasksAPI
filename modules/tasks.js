@@ -21,6 +21,7 @@ var getById = (req, res) => {
       " t.category_id," +
       " ts.name status_name, " +
       " t.status_id" +
+      " t.in_archive," +
       " from tasks t, categories c, task_statuses ts" +
       " where t.category_id = c.id and t.status_id = ts.id and t.id=? and t.user_id =?",
     [id, user.id],
@@ -44,6 +45,7 @@ var getByUser = (req, res) => {
       " t.category_id, " +
       " ts.name status_name, " +
       " t.status_id" +
+      " t.in_archive," +
       " from tasks t, categories c, task_statuses ts" +
       " where t.category_id = c.id and t.status_id = ts.id and t.user_id =?",
     [user.id],
@@ -62,12 +64,13 @@ var getByDate = (req, res) => {
     " select t.id," +
       " t.user_id, " +
       "  t.name, " +
-      " t.name_style, " +
+      "  t.name_style, " +
       "  t.description, " +
-      " c.name category_name, " +
+      "  c.name category_name, " +
       "  t.category_id, " +
       "  ts.name status_name, " +
       "  t.status_id," +
+      "  t.in_archive," +
       " (select SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time " +
       "  from task_log tl " +
       "  where tl.task_id = t.id" +
@@ -129,7 +132,7 @@ var updateById = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "update tasks set category_id=?, status_id=?, name=?, name_style=?, description=?, update_date =? where id=? and user_id =?",
+    "update tasks set category_id=?, status_id=?, name=?, name_style=?, description=?, update_date =?, in_archive =? where id=? and user_id =?",
     [
       task.category_id,
       task.status_id,
@@ -137,6 +140,7 @@ var updateById = (req, res) => {
       JSON.stringify(task.name_style),
       task.description,
       task.update_date,
+      task.in_archive,
       task.id,
       user.id
     ],
