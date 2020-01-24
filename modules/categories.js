@@ -40,7 +40,7 @@ var getByUser = (req, res) => {
         return item;
       });
 
-      utils.sendResultOrCode(error, result, res, 404);
+      utils.sendResultOrCode(error, utils.arrayToObject(result), res, 404);
     }
   );
 };
@@ -60,7 +60,32 @@ var add = (req, res) => {
       create_date: utils.getCurrentDate()
     },
     function(error, results) {
-      utils.sendResultOrCode(error, results, res, 400);
+      //Если добавили — получим этот объект и вернем уже его
+      if (typeof results.insertId === "number") {
+        connection.query(
+          "select * from categories where id=? and user_id =?",
+          [results.insertId, user.id],
+          function(error, results) {
+            //Преобразуем стили в объект
+            let result = results.map(item => {
+              item.name_style = JSON.parse(item.name_style);
+
+              return item;
+            });
+            //Если получилось — вернем результат или код ошибки
+            utils.sendResultOrCode(
+              error,
+              utils.arrayToObject(result),
+              res,
+              400
+            );
+          }
+        );
+      } else {
+        //Иначе вернем код ошибки
+        res.send(400);
+        res.end();
+      }
     }
   );
 };
@@ -81,7 +106,28 @@ var updateById = (req, res) => {
       user.id
     ],
     function(error, results) {
-      utils.sendResultOrCode(error, results, res, 520);
+      //Если обновили — получим этот объект и вернем уже его
+      if (typeof results.affectedRows === "number") {
+        connection.query(
+          "select * from categories where id=? and user_id =?",
+          [id, user.id],
+          function(error, results) {
+            //Преобразуем стили в объект
+            let result = results.map(item => {
+              item.name_style = JSON.parse(item.name_style);
+
+              return item;
+            });
+            //Если получилось — вернем результат или код ошибки
+            utils.sendResultOrCode(
+              error,
+              utils.arrayToObject(result),
+              res,
+              400
+            );
+          }
+        );
+      }
     }
   );
 };

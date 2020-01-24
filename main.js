@@ -1,6 +1,6 @@
 //Модули для работы с ДБ
 const users = require("./modules/users.js"),
-  roles = require("./modules/roles.js"),
+  userRoles = require("./modules/userRoles.js"),
   categories = require("./modules/categories.js"),
   tasks = require("./modules/tasks.js"),
   taskStatuses = require("./modules/taskStatuses.js"),
@@ -73,7 +73,7 @@ server.del("/api/users/:id", function(req, res) {
 
 //Получаем все роли пользователей
 server.get("/api/roles", function(req, res) {
-  roles.getAll(req, res);
+  userRoles.getAll(req, res);
 });
 
 /*

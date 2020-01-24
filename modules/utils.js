@@ -33,6 +33,19 @@ var getCurrentDateTime = function() {
   return yyyy + "-" + mm + "-" + dd + " " + hh + ":" + MM;
 };
 
+//Преобразовать массив в объект, где ID — название объекта
+var arrayToObject = function(array) {
+  let object = {};
+
+  array.forEach(item => {
+    //Создаем в объекте свойство с нужным ID
+    object[item.id] = item;
+  });
+
+  return object;
+};
+
+module.exports.arrayToObject = arrayToObject;
 module.exports.sendResultOrCode = sendResultOrCode;
 module.exports.getCurrentDate = getCurrentDate;
 module.exports.getCurrentDateTime = getCurrentDateTime;
