@@ -42,7 +42,7 @@ var getById = (req, res) => {
   let id = req.params.id;
 
   connection.query(
-    "select u.id, u.email, u.password, r.name role" +
+    "select u.id, u.email, u.password, u.role_id, r.name role" +
       " from users u, roles r " +
       " where u.role_id = r.id and u.id=?",
     [id],
@@ -59,7 +59,7 @@ var getAll = (req, res) => {
       " from users u, roles r" +
       " where u.role_id = r.id",
     function(error, results) {
-      utils.sendResultOrCode(error, results, res, 404);
+      utils.sendResultOrCode(error, utils.arrayToObject(results), res, 404);
     }
   );
 };
@@ -84,36 +84,68 @@ var add = (req, res) => {
 
 //Обновляем пользователя по ID
 var updateById = (req, res) => {
-  let userId = req.params.id;
   let user = req.body;
 
-  //Но сначала проверям, что такого email еще нет в базе
+  //Cначала проверям, что такого email еще нет в базе
   getByEmail(req, isExists => {
     if (!isExists) {
-      //Два возможных варианта обновления, с ролью и без
-      //Роль можно обновить в админке, но пользователь обновить её не может
       if (typeof user.role_id === "undefined") {
-        connection.query(
-          "update users set email=? where id=?",
-          [user.email, userId],
-          function(error, results) {
-            utils.sendResultOrCode(error, results, res, 520);
-          }
-        );
+        updateOnlyEmail(req, res);
       } else {
-        connection.query(
-          "update users set email=?, role_id=? Where id=?",
-          [user.email, user.role_id, userId],
-          function(error, results) {
-            utils.sendResultOrCode(error, results, res, 520);
-          }
-        );
+        updateEmailAndRole(req, res);
       }
     } else {
       res.send(409);
       res.end();
     }
   });
+};
+
+var updateOnlyEmail = (req, res) => {
+  let userId = req.params.id;
+  let user = req.body;
+
+  connection.query(
+    "update users set email=? where id=?",
+    [user.email, userId],
+    function(error, results) {
+      utils.sendResultOrCode(error, results, res, 520);
+    }
+  );
+};
+
+var updateEmailAndRole = (req, res) => {
+  let userId = req.params.id;
+  let user = req.body;
+
+  connection.query(
+    "update users set email=?, role_id=? Where id=?",
+    [user.email, user.role_id, userId],
+    function(error, results) {
+      //Если добавили — получим этот объект и вернем уже его
+      if (typeof results.insertId === "number") {
+        connection.query(
+          "select u.id, u.email, u.password, u.role_id, r.name role" +
+            " from users u, roles r " +
+            " where u.role_id = r.id and u.id=?",
+          [user.id],
+          function(error, results) {
+            //Если получилось — вернем результат или код ошибки
+            utils.sendResultOrCode(
+              error,
+              utils.arrayToObject(results),
+              res,
+              520
+            );
+          }
+        );
+      } else {
+        //Иначе вернем код ошибки
+        res.send(520);
+        res.end();
+      }
+    }
+  );
 };
 
 //Удаляем пользователя по ID
