@@ -71,6 +71,7 @@ var getByDate = (req, res) => {
       "  ts.name status_name, " +
       "  t.status_id," +
       "  t.in_archive," +
+      " ? for_date, " +
       " (select SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time " +
       "  from task_log tl " +
       "  where tl.task_id = t.id" +
@@ -98,7 +99,7 @@ var getByDate = (req, res) => {
       "  limit 1))" +
       " and t.user_id = ? " +
       " order by 1 asc", //Сортируем по ID
-    [date, date, date, date, date, user.id],
+    [date, date, date, date, date, date, user.id],
 
     //Преобразуем стили в объект
     function(error, results) {
@@ -108,7 +109,7 @@ var getByDate = (req, res) => {
         return item;
       });
 
-      utils.sendResultOrCode(error, result, res, 404);
+      utils.sendResultOrCode(error, utils.arrayToObject(result), res, 404);
     }
   );
 };
@@ -122,7 +123,42 @@ var add = (req, res) => {
   Object.assign(task, { user_id: user.id }, req.body);
 
   connection.query("insert into tasks set ?", task, function(error, results) {
-    utils.sendResultOrCode(error, results, res, 400);
+    //Если добавили — получим этот объект и вернем уже его
+    if (typeof results.insertId === "number") {
+      connection.query(
+        "select " +
+          " t.id, " +
+          " t.user_id, " +
+          " t.name, " +
+          " t.name_style, " +
+          " t.description, " +
+          " c.name category_name, " +
+          " t.category_id," +
+          " ts.name status_name, " +
+          " t.status_id, " +
+          " t.in_archive, " +
+          " ? for_date, " +
+          " null execution_time_day, " +
+          " null execution_time_to_day " +
+          " from tasks t, categories c, task_statuses ts" +
+          " where t.category_id = c.id and t.status_id = ts.id and t.id=? and t.user_id =?",
+        [task.create_date, results.insertId, user.id],
+        function(error, results) {
+          //Преобразуем стили в объект
+          let result = results.map(item => {
+            item.name_style = JSON.parse(item.name_style);
+
+            return item;
+          });
+          //Если получилось — вернем результат или код ошибки
+          utils.sendResultOrCode(error, utils.arrayToObject(result), res, 400);
+        }
+      );
+    } else {
+      //Иначе вернем код ошибки
+      res.send(400);
+      res.end();
+    }
   });
 };
 
@@ -145,7 +181,42 @@ var updateById = (req, res) => {
       user.id
     ],
     function(error, results) {
-      utils.sendResultOrCode(error, results, res, 520);
+      //Если обновили — получим этот объект и вернем уже его
+      if (typeof results.affectedRows === "number") {
+        connection.query(
+          "select " +
+            " t.id, " +
+            " t.user_id, " +
+            " t.name, " +
+            " t.name_style, " +
+            " t.description, " +
+            " c.name category_name, " +
+            " t.category_id," +
+            " ts.name status_name, " +
+            " t.status_id, " +
+            " t.in_archive, " +
+            " null execution_time_day, " +
+            " null execution_time_to_day " +
+            " from tasks t, categories c, task_statuses ts" +
+            " where t.category_id = c.id and t.status_id = ts.id and t.id=? and t.user_id =?",
+          [task.id, user.id],
+          function(error, results) {
+            //Преобразуем стили в объект
+            let result = results.map(item => {
+              item.name_style = JSON.parse(item.name_style);
+
+              return item;
+            });
+            //Если получилось — вернем результат или код ошибки
+            utils.sendResultOrCode(
+              error,
+              utils.arrayToObject(result),
+              res,
+              520
+            );
+          }
+        );
+      }
     }
   );
 };
