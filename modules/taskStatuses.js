@@ -30,7 +30,12 @@ var getAll = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "select ts.* from task_statuses ts where ts.user_id = ? order by ts.type_id, ts.id asc",
+    " select ts.* " +
+      " from task_statuses ts  " +
+      "where exists (select 1 from tasks t  " +
+      "               where t.status_id = ts.id) " +
+      "  and ts.user_id = ?  " +
+      "order by ts.type_id, ts.id asc ",
     [user.id],
     function(error, results) {
       //Преобразуем стили в объект

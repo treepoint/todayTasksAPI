@@ -30,7 +30,11 @@ var getByUser = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "select * from categories where user_id = ?",
+    "  select c.* " +
+      "  from categories c  " +
+      " where exists (select 1 from tasks t  " +
+      "                where t.category_id = c.id) " +
+      "   and user_id = ?",
     [user.id],
     function(error, results) {
       //Преобразуем стили в объект
