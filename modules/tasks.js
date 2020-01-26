@@ -20,37 +20,21 @@ var getById = (req, res) => {
       " c.name category_name, " +
       " t.category_id," +
       " ts.name status_name, " +
-      " t.status_id" +
-      " t.in_archive," +
+      " t.status_id, " +
+      " t.in_archive, " +
+      " null execution_time_day, " +
+      " null execution_time_to_day " +
       " from tasks t, categories c, task_statuses ts" +
       " where t.category_id = c.id and t.status_id = ts.id and t.id=? and t.user_id =?",
     [id, user.id],
     function(error, results) {
-      utils.sendResultOrCode(error, results, res, 404);
-    }
-  );
-};
+      let result = results.map(item => {
+        item.name_style = JSON.parse(item.name_style);
 
-//Получаем все задачи пользователя
-var getByUser = (req, res) => {
-  let user = tokens.getUserFromHeaders(req);
+        return item;
+      });
 
-  connection.query(
-    "select " +
-      " t.id," +
-      " t.user_id," +
-      " t.name, " +
-      " t.description, " +
-      " c.name category_name, " +
-      " t.category_id, " +
-      " ts.name status_name, " +
-      " t.status_id" +
-      " t.in_archive," +
-      " from tasks t, categories c, task_statuses ts" +
-      " where t.category_id = c.id and t.status_id = ts.id and t.user_id =?",
-    [user.id],
-    function(error, results) {
-      utils.sendResultOrCode(error, results, res, 404);
+      utils.sendResultOrCode(error, utils.arrayToObject(result), res, 404);
     }
   );
 };
@@ -244,7 +228,6 @@ var deleteById = (req, res) => {
 
 module.exports.getById = getById;
 module.exports.getByDate = getByDate;
-module.exports.getByUser = getByUser;
 module.exports.add = add;
 module.exports.updateById = updateById;
 module.exports.deleteById = deleteById;

@@ -114,11 +114,6 @@ server.get("/api/tasks/:id", function(req, res) {
   tasks.getById(req, res);
 });
 
-//Получаем все задачи пользователя
-server.get("/api/tasks", function(req, res) {
-  tasks.getByUser(req, res);
-});
-
 //Получаем все задачи пользователя за определенную дату
 server.get("/api/tasks/date/:date", function(req, res) {
   tasks.getByDate(req, res);
@@ -180,11 +175,6 @@ server.get("/api/task_statuses_types", function(req, res) {
 /*
  * Лог выполнения задач
  */
-
-//Получаем весь лог
-server.get("/api/tasks_log", function(req, res) {
-  taskLog.getAll(req, res);
-});
 
 //Получаем весь лог за определенную дату
 server.get("/api/tasks_log/date/:date", function(req, res) {
