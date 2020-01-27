@@ -32,8 +32,7 @@ var getAll = (req, res) => {
   connection.query(
     " select ts.* " +
       " from task_statuses ts  " +
-      "where exists (select 1 from tasks t  " +
-      "               where t.status_id = ts.id) " +
+      "where (ts.close_date is null or exists (select 1 from tasks t where t.status_id = ts.id)) " +
       "  and ts.user_id = ?  " +
       "order by ts.type_id, ts.id asc ",
     [user.id],

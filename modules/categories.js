@@ -32,8 +32,7 @@ var getByUser = (req, res) => {
   connection.query(
     "  select c.* " +
       "  from categories c  " +
-      " where exists (select 1 from tasks t  " +
-      "                where t.category_id = c.id) " +
+      " where (c.close_date is null or exists (select 1 from tasks t where t.category_id = c.id)) "+
       "   and user_id = ?",
     [user.id],
     function(error, results) {
