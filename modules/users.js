@@ -59,7 +59,7 @@ var getAll = (req, res) => {
       " from users u, roles r" +
       " where u.role_id = r.id",
     function(error, results) {
-      utils.sendResultOrCode(error, utils.arrayToObject(results), res, 404);
+      utils.sendResultOrCode(error, utils.arrayToIdObject(results), res, 404);
     }
   );
 };
@@ -133,7 +133,7 @@ var updateEmailAndRole = (req, res) => {
             //Если получилось — вернем результат или код ошибки
             utils.sendResultOrCode(
               error,
-              utils.arrayToObject(results),
+              utils.arrayToIdObject(results),
               res,
               520
             );

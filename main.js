@@ -8,6 +8,7 @@ const users = require("./modules/users.js"),
   taskLog = require("./modules/taskLog.js"),
   auth = require("./modules/auth.js"),
   statistics = require("./modules/statistics.js");
+userSettings = require("./modules/userSettings.js");
 
 //Служебные модули
 const utils = require("./modules/utils.js"),
@@ -216,4 +217,23 @@ server.get("/api/categories/statistic/period/:dateFrom/:dateTo", function(
   res
 ) {
   statistics.getCategoriesExecutionTimeByPeriod(req, res);
+});
+
+/*
+ * Пользовательские настройки
+ */
+
+//Получаем все настройки
+server.get("/api/user_settings", function(req, res) {
+  userSettings.getAll(req, res);
+});
+
+//Обновляем настройки по ID
+server.put("/api/user_settings/:id", function(req, res) {
+  userSettings.updateById(req, res);
+});
+
+//Загружаем обои
+server.post("/api/user_settings/load_tasks_wallpaper", function(req, res) {
+  userSettings.loadTasksWallpaper(req, res);
 });

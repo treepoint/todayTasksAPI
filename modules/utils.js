@@ -34,7 +34,7 @@ var getCurrentDateTime = function() {
 };
 
 //Преобразовать массив в объект, где ID — название объекта
-var arrayToObject = function(array) {
+var arrayToIdObject = function(array) {
   let object = {};
 
   array.forEach(item => {
@@ -45,7 +45,20 @@ var arrayToObject = function(array) {
   return object;
 };
 
+//Преобразовать массив в объект, где ID — название объекта
+var arrayToObject = function(array) {
+  let object = {};
+
+  array.forEach(item => {
+    //Создаем в объекте свойство с нужным ID
+    Object.assign(object, item);
+  });
+
+  return object;
+};
+
 module.exports.arrayToObject = arrayToObject;
+module.exports.arrayToIdObject = arrayToIdObject;
 module.exports.sendResultOrCode = sendResultOrCode;
 module.exports.getCurrentDate = getCurrentDate;
 module.exports.getCurrentDateTime = getCurrentDateTime;

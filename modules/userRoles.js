@@ -8,7 +8,7 @@ var getAll = (req, res) => {
   connection.query(
     "select r.id, r.name, r.description" + " from roles r",
     function(error, results) {
-      utils.sendResultOrCode(error, utils.arrayToObject(results), res, 404);
+      utils.sendResultOrCode(error, utils.arrayToIdObject(results), res, 404);
     }
   );
 };

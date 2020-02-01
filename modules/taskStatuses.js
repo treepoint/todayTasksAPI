@@ -44,7 +44,7 @@ var getAll = (req, res) => {
         return item;
       });
 
-      utils.sendResultOrCode(error, utils.arrayToObject(result), res, 404);
+      utils.sendResultOrCode(error, utils.arrayToIdObject(result), res, 404);
     }
   );
 };
@@ -79,7 +79,7 @@ var add = (req, res) => {
             //Если получилось — вернем результат или код ошибки
             utils.sendResultOrCode(
               error,
-              utils.arrayToObject(result),
+              utils.arrayToIdObject(result),
               res,
               400
             );
@@ -125,7 +125,7 @@ var updateById = (req, res) => {
             //Если получилось — вернем результат или код ошибки
             utils.sendResultOrCode(
               error,
-              utils.arrayToObject(result),
+              utils.arrayToIdObject(result),
               res,
               400
             );

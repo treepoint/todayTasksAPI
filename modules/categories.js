@@ -32,7 +32,7 @@ var getByUser = (req, res) => {
   connection.query(
     "  select c.* " +
       "  from categories c  " +
-      " where (c.close_date is null or exists (select 1 from tasks t where t.category_id = c.id)) "+
+      " where (c.close_date is null or exists (select 1 from tasks t where t.category_id = c.id)) " +
       "   and user_id = ?",
     [user.id],
     function(error, results) {
@@ -43,7 +43,7 @@ var getByUser = (req, res) => {
         return item;
       });
 
-      utils.sendResultOrCode(error, utils.arrayToObject(result), res, 404);
+      utils.sendResultOrCode(error, utils.arrayToIdObject(result), res, 404);
     }
   );
 };
@@ -78,7 +78,7 @@ var add = (req, res) => {
             //Если получилось — вернем результат или код ошибки
             utils.sendResultOrCode(
               error,
-              utils.arrayToObject(result),
+              utils.arrayToIdObject(result),
               res,
               400
             );
@@ -124,7 +124,7 @@ var updateById = (req, res) => {
             //Если получилось — вернем результат или код ошибки
             utils.sendResultOrCode(
               error,
-              utils.arrayToObject(result),
+              utils.arrayToIdObject(result),
               res,
               400
             );

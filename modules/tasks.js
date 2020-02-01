@@ -34,7 +34,7 @@ var getById = (req, res) => {
         return item;
       });
 
-      utils.sendResultOrCode(error, utils.arrayToObject(result), res, 404);
+      utils.sendResultOrCode(error, utils.arrayToIdObject(result), res, 404);
     }
   );
 };
@@ -93,7 +93,7 @@ var getByDate = (req, res) => {
         return item;
       });
 
-      utils.sendResultOrCode(error, utils.arrayToObject(result), res, 404);
+      utils.sendResultOrCode(error, utils.arrayToIdObject(result), res, 404);
     }
   );
 };
@@ -135,7 +135,12 @@ var add = (req, res) => {
             return item;
           });
           //Если получилось — вернем результат или код ошибки
-          utils.sendResultOrCode(error, utils.arrayToObject(result), res, 400);
+          utils.sendResultOrCode(
+            error,
+            utils.arrayToIdObject(result),
+            res,
+            400
+          );
         }
       );
     } else {
@@ -194,7 +199,7 @@ var updateById = (req, res) => {
             //Если получилось — вернем результат или код ошибки
             utils.sendResultOrCode(
               error,
-              utils.arrayToObject(result),
+              utils.arrayToIdObject(result),
               res,
               520
             );

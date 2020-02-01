@@ -22,5 +22,6 @@ module.exports = {
     refreshSecret: "&@$!changememe!$@&",
     expiresIn: "4320m",
     refreshExpiresIn: "5760m"
-  }
+  },
+  uploadFilesDirectory: "../haveDone/release/files"
 };

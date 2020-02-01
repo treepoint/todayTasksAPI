@@ -9,7 +9,7 @@ var getAll = (req, res) => {
     error,
     results
   ) {
-    utils.sendResultOrCode(error, utils.arrayToObject(results), res, 404);
+    utils.sendResultOrCode(error, utils.arrayToIdObject(results), res, 404);
   });
 };
 
