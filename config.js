@@ -1,16 +1,17 @@
 "use strict";
 
-var mysql = require("mysql");
+const mysql = require("mysql");
+const path = require("path");
 
 module.exports = {
   name: "haveDoneAPI",
   hostname: "http://localhost/api/",
-  version: "0.4.0",
+  version: "0.4.1",
   env: process.env.NODE_ENV || "development",
   port: process.env.PORT || 5000,
   db: {
     get: mysql.createConnection({
-      host: "188.17.156.77",
+      host: "192.168.0.99",
       port: "3306",
       user: "haveDone",
       password: "test",
@@ -23,5 +24,5 @@ module.exports = {
     expiresIn: "4320m",
     refreshExpiresIn: "5760m"
   },
-  uploadFilesDirectory: "../haveDone/release/files"
+  uploadFilesDirectory: path.join(__dirname, "../haveDone/release/files")
 };
