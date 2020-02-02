@@ -49,15 +49,23 @@ var deleteFile = (filename, callback) => {
     return;
   }
 
-  fs.unlink(path, function(error) {
-    if (error) {
-      if (typeof callback !== "undefined") {
-        callback({ error: "Не удалось удалить файл" });
-      }
+  //Сначала проверим, что он вообще есть
+  fs.readFile(path, "utf8", function(error, contents) {
+    //Если ничего не прочитали — файла нет
+    if (contents === undefined) {
+      callback({ notExistingFile: true });
     } else {
-      if (typeof callback !== "undefined") {
-        callback({ status: true });
-      }
+      fs.unlink(path, function(error) {
+        if (error) {
+          if (typeof callback !== "undefined") {
+            callback({ error: "Не удалось удалить файл" });
+          }
+        } else {
+          if (typeof callback !== "undefined") {
+            callback({ status: true });
+          }
+        }
+      });
     }
   });
 };

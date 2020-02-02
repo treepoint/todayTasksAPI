@@ -65,7 +65,8 @@ var loadTasksWallpaper = (req, res) => {
   getCurrentTasksWallpaper(user.id, result => {
     if (result.error) {
       //не смогли — отправим ошибку
-      res.end(500, JSON.stringify(result));
+      res.send(500, result);
+      res.end();
       return;
     }
 
@@ -73,7 +74,8 @@ var loadTasksWallpaper = (req, res) => {
     files.deleteFile(result.tasks_wallpaper, result => {
       //Если не смогли удалить — отправим ошибку
       if (result.error) {
-        res.end(502, JSON.stringify(result.error));
+        res.send(500, result);
+        res.end();
         return;
       }
 
@@ -83,19 +85,18 @@ var loadTasksWallpaper = (req, res) => {
           //Если записали — обновим настройки
           updateSettings(result.filename, user.id, result => {
             if (result.error) {
-              res.end(500, JSON.stringify(result));
+              res.send(500, result);
             } else {
-              res.end(JSON.stringify(result));
+              res.send(result);
             }
+            res.end();
           });
         } else {
           //Не смогли записать — отправим ошибку
-          res.end(
-            500,
-            JSON.stringify({
-              error: "Не удалось сохранить новый файл"
-            })
-          );
+          res.send(500, {
+            error: "Не удалось сохранить новый файл"
+          });
+          res.end();
         }
       });
     });
