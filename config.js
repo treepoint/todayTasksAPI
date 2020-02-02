@@ -24,5 +24,5 @@ module.exports = {
     expiresIn: "4320m",
     refreshExpiresIn: "5760m"
   },
-  uploadFilesDirectory: path.join(__dirname, "../haveDone/release/files")
+  uploadFilesDirectory: path.join(__dirname, "../haveDoneFiles/files")
 };
