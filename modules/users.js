@@ -87,29 +87,63 @@ var updateById = (req, res) => {
   let user = req.body;
 
   //Cначала проверям, что такого email еще нет в базе
-  getByEmail(req, isExists => {
-    if (!isExists) {
-      if (typeof user.role_id === "undefined") {
-        updateOnlyEmail(req, res);
+  checkDouplicateEmailWhileUpdate(user.email, user.id, result => {
+    if (!result.emailIsExists) {
+      if (typeof user.password !== "undefined") {
+        updateEmailAndPassword(req, res);
       } else {
         updateEmailAndRole(req, res);
       }
     } else {
-      res.send(409);
+      res.send(409, { error: "такой email уже есть в базе" });
       res.end();
     }
   });
 };
 
-var updateOnlyEmail = (req, res) => {
+var checkDouplicateEmailWhileUpdate = (email, userId, callback) => {
+  connection.query(
+    "select 1 emailIsExists " +
+      "  from users" +
+      " where email = ?" +
+      "   and id != ?",
+    [email, userId],
+    function(error, results) {
+      callback(utils.arrayToObject(results));
+    }
+  );
+};
+
+var updateEmailAndPassword = (req, res) => {
   let userId = req.params.id;
   let user = req.body;
 
   connection.query(
-    "update users set email=? where id=?",
-    [user.email, userId],
+    "update users set email=?, password=? where id=?",
+    [user.email, user.password, userId],
     function(error, results) {
-      utils.sendResultOrCode(error, results, res, 520);
+      //Если добавили — получим этот объект и вернем уже его
+      if (typeof results.insertId === "number") {
+        connection.query(
+          "select u.id, u.email, u.password, u.role_id, r.name role" +
+            " from users u, roles r " +
+            " where u.role_id = r.id and u.id=?",
+          [userId],
+          function(error, results) {
+            //Если получилось — вернем результат или код ошибки
+            utils.sendResultOrCode(
+              error,
+              utils.arrayToIdObject(results),
+              res,
+              520
+            );
+          }
+        );
+      } else {
+        //Иначе вернем код ошибки
+        res.send(520);
+        res.end();
+      }
     }
   );
 };
