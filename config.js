@@ -13,7 +13,7 @@ module.exports = {
     get: mysql.createConnection({
       host: "192.168.0.99",
       port: "3306",
-      user: "haveDone",
+      user: "testHaveDone",
       password: "test",
       database: "test_haveDoneDB"
     })
