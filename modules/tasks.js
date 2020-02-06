@@ -23,6 +23,7 @@ var getById = (req, res) => {
       " t.status_id, " +
       " t.in_archive, " +
       " t.on_fire, " +
+      " DATE_FORMAT(t.moved_date,'%Y-%m-%d') moved_date," +
       " null execution_time_day, " +
       " null execution_time_to_day " +
       " from tasks t, categories c, task_statuses ts" +
@@ -57,6 +58,7 @@ var getByDate = (req, res) => {
       "  t.status_id," +
       "  t.in_archive," +
       "  t.on_fire," +
+      "  DATE_FORMAT(t.moved_date,'%Y-%m-%d') moved_date," +
       " ? for_date, " +
       " (select SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time " +
       "  from task_log tl " +
@@ -83,9 +85,11 @@ var getByDate = (req, res) => {
       "   where tl.task_id = t.id" +
       "             and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') = ?" +
       "  limit 1))" +
+      //Получаем задачи, дата переноса которых равна или меньшее нужной даты. Ну или пустая
+      " and (DATE_FORMAT(t.moved_date,'%Y-%m-%d') <= ? or t.moved_date is null) " +
       " and t.user_id = ? " +
       " order by 1 asc", //Сортируем по ID
-    [date, date, date, date, date, date, user.id],
+    [date, date, date, date, date, date, date, user.id],
 
     //Преобразуем стили в объект
     function(error, results) {
@@ -124,6 +128,7 @@ var add = (req, res) => {
           " t.status_id, " +
           " t.in_archive, " +
           " t.on_fire, " +
+          " DATE_FORMAT(t.moved_date,'%Y-%m-%d') moved_date," +
           " ? for_date, " +
           " null execution_time_day, " +
           " null execution_time_to_day " +
@@ -168,7 +173,8 @@ var updateById = (req, res) => {
       " description=?, " +
       " update_date =?, " +
       " in_archive =?, " +
-      " on_fire =? " +
+      " on_fire =?, " +
+      " moved_date =? " +
       "where id=? " +
       "  and user_id =?",
     [
@@ -180,6 +186,7 @@ var updateById = (req, res) => {
       task.update_date,
       task.in_archive,
       task.on_fire,
+      task.moved_date,
       task.id,
       user.id
     ],
@@ -199,6 +206,7 @@ var updateById = (req, res) => {
             " t.status_id, " +
             " t.in_archive, " +
             " t.on_fire, " +
+            " DATE_FORMAT(t.moved_date,'%Y-%m-%d') moved_date," +
             " null execution_time_day, " +
             " null execution_time_to_day " +
             " from tasks t, categories c, task_statuses ts" +
