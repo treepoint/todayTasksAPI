@@ -14,7 +14,6 @@ var getTasksExecutionTimeByPeriod = (req, res) => {
   connection.query(
     "select" +
       " t.name," +
-      " t.name_style," +
       " c.name category_name," +
       " c.name_style category_name_style," +
       " SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time" +
@@ -27,15 +26,7 @@ var getTasksExecutionTimeByPeriod = (req, res) => {
       " group by t.id, t.name ",
     [user.id, dateFrom, dateTo],
     function(error, results) {
-      //Преобразуем стили в объект
-      let result = results.map(item => {
-        item.name_style = JSON.parse(item.name_style);
-        item.category_name_style = JSON.parse(item.category_name_style);
-
-        return item;
-      });
-
-      utils.sendResultOrCode(error, result, res, 404);
+      utils.sendResultOrCode(error, results, res, 404);
     }
   );
 };
