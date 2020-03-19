@@ -16,7 +16,11 @@ var startServer = () => {
 
   server.use(restify.plugins.acceptParser(server.acceptable));
   server.use(restify.plugins.queryParser());
-  server.use(restify.plugins.bodyParser());
+  server.use(
+    restify.plugins.bodyParser({
+      maxBodySize: 1024
+    })
+  );
   console.log;
   server.use(
     rjwt(config.jwt).unless({
