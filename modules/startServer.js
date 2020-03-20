@@ -18,7 +18,7 @@ var startServer = () => {
   server.use(restify.plugins.queryParser());
   server.use(
     restify.plugins.bodyParser({
-      maxBodySize: 1024
+      maxBodySize: 33554432
     })
   );
   console.log;
