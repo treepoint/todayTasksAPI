@@ -167,16 +167,26 @@ server.get("/api/categories/time_execution/all", function(req, res) {
 });
 
 //Получаем время исполнения задач по конкретному периоду
-server.get("/api/tasks/statistic/period/:dateFrom/:dateTo", function(req, res) {
+server.get("/api/statistic/tasks/period/:dateFrom/:dateTo", function(req, res) {
   statistics.getTasksExecutionTimeByPeriod(req, res);
 });
 
 //Получаем время исполнения задач по конкретному периоду
-server.get("/api/categories/statistic/period/:dateFrom/:dateTo", function(
+server.get("/api/statistic/categories/period/:dateFrom/:dateTo", function(
   req,
   res
 ) {
   statistics.getCategoriesExecutionTimeByPeriod(req, res);
+});
+
+//Получаем суммарное время исполнения задач по конкретному периоду
+server.get("/api/statistic/total/period/:dateFrom/:dateTo", function(req, res) {
+  statistics.getTotalExecutionTimeByPeriod(req, res);
+});
+
+//Получаем статистику по времени за дни определенного периода
+server.get("/api/statistic/days/period/:dateFrom/:dateTo", function(req, res) {
+  statistics.getStatisticByDaysForPeriod(req, res);
 });
 
 /*

@@ -96,6 +96,56 @@ var getCategoriesExecutionTimeForAll = (req, res) => {
   );
 };
 
+//Получаем суммарно время исполнения задач по конкретному периоду
+var getTotalExecutionTimeByPeriod = (req, res) => {
+  let dateFrom = req.params.dateFrom;
+  let dateTo = req.params.dateTo;
+
+  let user = tokens.getUserFromHeaders(req);
+
+  connection.query(
+    "select SUM(execution_time) execution_time from (" +
+      "select" +
+      " SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time" +
+      " from task_log tl, tasks t" +
+      " where tl.task_id = t.id" +
+      "   and t.user_id = ?" +
+      "   and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') BETWEEN ? and ?" +
+      "   and tl.execution_start < tl.execution_end" +
+      " group by t.id, t.name ) t",
+    [user.id, dateFrom, dateTo],
+    function(error, results) {
+      utils.sendResultOrCode(error, utils.arrayToObject(results), res, 404);
+    }
+  );
+};
+
+//Получаем статистику по времени за дни определенного периода
+var getStatisticByDaysForPeriod = (req, res) => {
+  let dateFrom = req.params.dateFrom;
+  let dateTo = req.params.dateTo;
+
+  let user = tokens.getUserFromHeaders(req);
+
+  connection.query(
+    "select " +
+      " DATE_FORMAT(tl.execution_start,'%Y-%m-%d') date, SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time " +
+      " from task_log tl, tasks t " +
+      " where tl.task_id = t.id " +
+      "   and t.user_id = ? " +
+      "   and tl.execution_start < tl.execution_end " +
+      "	  and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') BETWEEN ? and ? " +
+      " group by 1 " +
+      " order by 1 ",
+    [user.id, dateFrom, dateTo],
+    function(error, results) {
+      utils.sendResultOrCode(error, results, res, 404);
+    }
+  );
+};
+
+module.exports.getStatisticByDaysForPeriod = getStatisticByDaysForPeriod;
 module.exports.getTasksExecutionTimeByPeriod = getTasksExecutionTimeByPeriod;
 module.exports.getCategoriesExecutionTimeByPeriod = getCategoriesExecutionTimeByPeriod;
+module.exports.getTotalExecutionTimeByPeriod = getTotalExecutionTimeByPeriod;
 module.exports.getCategoriesExecutionTimeForAll = getCategoriesExecutionTimeForAll;

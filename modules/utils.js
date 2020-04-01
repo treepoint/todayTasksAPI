@@ -45,12 +45,12 @@ var arrayToIdObject = function(array) {
   return object;
 };
 
-//Преобразовать массив в объект, где ID — название объекта
+//Преобразовать массив в объект
 var arrayToObject = function(array) {
   let object = {};
 
   array.forEach(item => {
-    //Создаем в объекте свойство с нужным ID
+    //Создаем в объекте свойство
     Object.assign(object, item);
   });
 
