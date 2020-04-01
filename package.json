@@ -10,11 +10,12 @@
     "blob": "0.0.5",
     "filereader": "^0.10.3",
     "form-data": "^3.0.0",
-    "formidable": "^1.2.1",
+    "formidable": "^1.2.2",
     "jsonwebtoken": "^8.5.1",
-    "mysql": "^2.17.1",
+    "minimist": "^1.2.5",
+    "mysql": "^2.18.1",
     "randomstring": "^1.1.5",
-    "restify": "^8.4.0",
-    "restify-jwt-community": "^1.1.1"
+    "restify": "^8.5.1",
+    "restify-jwt-community": "^1.1.2"
   }
 }
