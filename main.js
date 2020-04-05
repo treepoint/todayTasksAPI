@@ -99,11 +99,6 @@ server.put("/api/categories/:id", function(req, res) {
   categories.updateById(req, res);
 });
 
-//Закрываем категорию пользователя
-server.del("/api/categories/:id", function(req, res) {
-  categories.closeById(req, res);
-});
-
 /*
  * Задачи
  */

@@ -100,11 +100,12 @@ var updateById = (req, res) => {
 
   let user = tokens.getUserFromHeaders(req);
   connection.query(
-    "update categories set name=?, name_style = ?, description=? Where id=? and user_id =?",
+    "update categories set name=?, name_style = ?, description=?, close_date=? Where id=? and user_id =?",
     [
       category.name,
       JSON.stringify(category.name_style),
       category.description,
+      category.close_date,
       id,
       user.id
     ],
