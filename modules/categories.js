@@ -10,11 +10,18 @@ var getById = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "select * from categories where id=? and user_id =?",
+    " select c.*, " +
+      " (select count(1)  " +
+      "    from tasks ts " +
+      " where ts.category_id = c.id " +
+      "   and (ts.closed_date is null or ts.closed_date > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) active_tasks_count " +
+      "  from categories c " +
+      " where c.category_id = ?  " +
+      "   and c.user_id = ?",
     [id, user.id],
-    function(error, results) {
+    function (error, results) {
       //Преобразуем стили в объект
-      let result = results.map(item => {
+      let result = results.map((item) => {
         item.name_style = JSON.parse(item.name_style);
 
         return item;
@@ -30,14 +37,18 @@ var getByUser = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "  select c.* " +
-      "  from categories c  " +
-      " where (c.close_date is null or exists (select 1 from tasks t where t.category_id = c.id)) " +
+    " select c.*, " +
+      " (select count(1)  " +
+      "    from tasks ts " +
+      " where ts.category_id = c.id " +
+      "   and (ts.closed_date is null or ts.closed_date > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) active_tasks_count " +
+      "  from categories c " +
+      " where (c.close_date is null or exists (select 1 from tasks t where t.category_id = c.id))  " +
       "   and user_id = ?",
     [user.id],
-    function(error, results) {
+    function (error, results) {
       //Преобразуем стили в объект
-      let result = results.map(item => {
+      let result = results.map((item) => {
         item.name_style = JSON.parse(item.name_style);
 
         return item;
@@ -60,17 +71,24 @@ var add = (req, res) => {
       name: category.name,
       name_style: category.name_style,
       description: category.description,
-      create_date: utils.getCurrentDate()
+      create_date: utils.getCurrentDate(),
     },
-    function(error, results) {
+    function (error, results) {
       //Если добавили — получим этот объект и вернем уже его
       if (typeof results.insertId === "number") {
         connection.query(
-          "select * from categories where id=? and user_id =?",
+          " select c.*, " +
+            " (select count(1)  " +
+            "    from tasks ts " +
+            " where ts.category_id = c.id " +
+            "   and (ts.closed_date is null or ts.closed_date > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) active_tasks_count " +
+            "  from categories c " +
+            " where c.id = ?  " +
+            "   and c.user_id = ?",
           [results.insertId, user.id],
-          function(error, results) {
+          function (error, results) {
             //Преобразуем стили в объект
-            let result = results.map(item => {
+            let result = results.map((item) => {
               item.name_style = JSON.parse(item.name_style);
 
               return item;
@@ -107,17 +125,24 @@ var updateById = (req, res) => {
       category.description,
       category.close_date,
       id,
-      user.id
+      user.id,
     ],
-    function(error, results) {
+    function (error, results) {
       //Если обновили — получим этот объект и вернем уже его
       if (typeof results.affectedRows === "number") {
         connection.query(
-          "select * from categories where id=? and user_id =?",
+          " select c.*, " +
+            " (select count(1)  " +
+            "    from tasks ts " +
+            " where ts.category_id = c.id " +
+            "   and (ts.closed_date is null or ts.closed_date > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) active_tasks_count " +
+            "  from categories c " +
+            " where c.id = ?  " +
+            "   and c.user_id = ?",
           [id, user.id],
-          function(error, results) {
+          function (error, results) {
             //Преобразуем стили в объект
-            let result = results.map(item => {
+            let result = results.map((item) => {
               item.name_style = JSON.parse(item.name_style);
 
               return item;
@@ -144,7 +169,7 @@ var closeById = (req, res) => {
   connection.query(
     "update categories set close_date=? where id=? and user_id = ?",
     [utils.getCurrentDate(), id, user.id],
-    function(error, results) {
+    function (error, results) {
       utils.sendResultOrCode(error, results, res, 520);
     }
   );
