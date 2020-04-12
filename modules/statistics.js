@@ -25,7 +25,7 @@ var getTasksExecutionTimeByPeriod = (req, res) => {
       "   and tl.execution_start < tl.execution_end" +
       " group by t.id, t.name ",
     [user.id, dateFrom, dateTo],
-    function(error, results) {
+    function (error, results) {
       utils.sendResultOrCode(error, results, res, 404);
     }
   );
@@ -51,9 +51,9 @@ var getCategoriesExecutionTimeByPeriod = (req, res) => {
       " and tl.execution_start < tl.execution_end" +
       " group by c.name",
     [user.id, dateFrom, dateTo],
-    function(error, results) {
+    function (error, results) {
       //Преобразуем стили в объект
-      let result = results.map(item => {
+      let result = results.map((item) => {
         item.name_style = JSON.parse(item.name_style);
 
         return item;
@@ -83,9 +83,9 @@ var getCategoriesExecutionTimeForAll = (req, res) => {
       " where t.execution_time >= 0" +
       " group by 1",
     [user.id],
-    function(error, results) {
+    function (error, results) {
       //Преобразуем стили в объект
-      let result = results.map(item => {
+      let result = results.map((item) => {
         item.name_style = JSON.parse(item.name_style);
 
         return item;
@@ -114,7 +114,7 @@ var getTotalExecutionTimeByPeriod = (req, res) => {
       "   and tl.execution_start < tl.execution_end" +
       " group by t.id, t.name ) t",
     [user.id, dateFrom, dateTo],
-    function(error, results) {
+    function (error, results) {
       utils.sendResultOrCode(error, utils.arrayToObject(results), res, 404);
     }
   );
@@ -138,8 +138,27 @@ var getStatisticByDaysForPeriod = (req, res) => {
       " group by 1 " +
       " order by 1 ",
     [user.id, dateFrom, dateTo],
-    function(error, results) {
+    function (error, results) {
       utils.sendResultOrCode(error, results, res, 404);
+    }
+  );
+};
+
+//Получаем количество активных задач в разрезе категорий
+var getActiveTasksCountByCategories = (req, res) => {
+  let user = tokens.getUserFromHeaders(req);
+
+  connection.query(
+    " select c.id, " +
+      " (select count(1)  " +
+      "    from tasks ts " +
+      " where ts.category_id = c.id " +
+      "   and (ts.closed_date is null or DATE_FORMAT(ts.closed_date,'%Y-%m-%d') > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) count " +
+      "  from categories c " +
+      " where c.user_id = ?",
+    [user.id],
+    function (error, results) {
+      utils.sendResultOrCode(error, utils.arrayToIdObject(results), res, 404);
     }
   );
 };
@@ -149,3 +168,4 @@ module.exports.getTasksExecutionTimeByPeriod = getTasksExecutionTimeByPeriod;
 module.exports.getCategoriesExecutionTimeByPeriod = getCategoriesExecutionTimeByPeriod;
 module.exports.getTotalExecutionTimeByPeriod = getTotalExecutionTimeByPeriod;
 module.exports.getCategoriesExecutionTimeForAll = getCategoriesExecutionTimeForAll;
+module.exports.getActiveTasksCountByCategories = getActiveTasksCountByCategories;

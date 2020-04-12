@@ -10,14 +10,7 @@ var getById = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    " select c.*, " +
-      " (select count(1)  " +
-      "    from tasks ts " +
-      " where ts.category_id = c.id " +
-      "   and (ts.closed_date is null or DATE_FORMAT(ts.closed_date,'%Y-%m-%d') > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) active_tasks_count " +
-      "  from categories c " +
-      " where c.category_id = ?  " +
-      "   and c.user_id = ?",
+    "select * from categories where id=? and user_id =?",
     [id, user.id],
     function (error, results) {
       //Преобразуем стили в объект
@@ -37,13 +30,9 @@ var getByUser = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    " select c.*, " +
-      " (select count(1)  " +
-      "    from tasks ts " +
-      " where ts.category_id = c.id " +
-      "   and (ts.closed_date is null or DATE_FORMAT(ts.closed_date,'%Y-%m-%d') > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) active_tasks_count " +
-      "  from categories c " +
-      " where (c.close_date is null or exists (select 1 from tasks t where t.category_id = c.id))  " +
+    "  select c.* " +
+      "  from categories c  " +
+      " where (c.close_date is null or exists (select 1 from tasks t where t.category_id = c.id)) " +
       "   and user_id = ?",
     [user.id],
     function (error, results) {
@@ -77,14 +66,7 @@ var add = (req, res) => {
       //Если добавили — получим этот объект и вернем уже его
       if (typeof results.insertId === "number") {
         connection.query(
-          " select c.*, " +
-            " (select count(1)  " +
-            "    from tasks ts " +
-            " where ts.category_id = c.id " +
-            "   and (ts.closed_date is null or DATE_FORMAT(ts.closed_date,'%Y-%m-%d') > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) active_tasks_count " +
-            "  from categories c " +
-            " where c.id = ?  " +
-            "   and c.user_id = ?",
+          "select * from categories where id=? and user_id =?",
           [results.insertId, user.id],
           function (error, results) {
             //Преобразуем стили в объект
@@ -131,14 +113,7 @@ var updateById = (req, res) => {
       //Если обновили — получим этот объект и вернем уже его
       if (typeof results.affectedRows === "number") {
         connection.query(
-          " select c.*, " +
-            " (select count(1)  " +
-            "    from tasks ts " +
-            " where ts.category_id = c.id " +
-            "   and (ts.closed_date is null or DATE_FORMAT(ts.closed_date,'%Y-%m-%d') > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) active_tasks_count " +
-            "  from categories c " +
-            " where c.id = ?  " +
-            "   and c.user_id = ?",
+          "select * from categories where id=? and user_id =?",
           [id, user.id],
           function (error, results) {
             //Преобразуем стили в объект
