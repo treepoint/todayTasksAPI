@@ -14,7 +14,7 @@ var getById = (req, res) => {
       " (select count(1)  " +
       "    from tasks ts " +
       " where ts.category_id = c.id " +
-      "   and (ts.closed_date is null or ts.closed_date > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) active_tasks_count " +
+      "   and (ts.closed_date is null or DATE_FORMAT(ts.closed_date,'%Y-%m-%d') > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) active_tasks_count " +
       "  from categories c " +
       " where c.category_id = ?  " +
       "   and c.user_id = ?",
@@ -41,7 +41,7 @@ var getByUser = (req, res) => {
       " (select count(1)  " +
       "    from tasks ts " +
       " where ts.category_id = c.id " +
-      "   and (ts.closed_date is null or ts.closed_date > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) active_tasks_count " +
+      "   and (ts.closed_date is null or DATE_FORMAT(ts.closed_date,'%Y-%m-%d') > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) active_tasks_count " +
       "  from categories c " +
       " where (c.close_date is null or exists (select 1 from tasks t where t.category_id = c.id))  " +
       "   and user_id = ?",
@@ -81,7 +81,7 @@ var add = (req, res) => {
             " (select count(1)  " +
             "    from tasks ts " +
             " where ts.category_id = c.id " +
-            "   and (ts.closed_date is null or ts.closed_date > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) active_tasks_count " +
+            "   and (ts.closed_date is null or DATE_FORMAT(ts.closed_date,'%Y-%m-%d') > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) active_tasks_count " +
             "  from categories c " +
             " where c.id = ?  " +
             "   and c.user_id = ?",
@@ -135,7 +135,7 @@ var updateById = (req, res) => {
             " (select count(1)  " +
             "    from tasks ts " +
             " where ts.category_id = c.id " +
-            "   and (ts.closed_date is null or ts.closed_date > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) active_tasks_count " +
+            "   and (ts.closed_date is null or DATE_FORMAT(ts.closed_date,'%Y-%m-%d') > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) active_tasks_count " +
             "  from categories c " +
             " where c.id = ?  " +
             "   and c.user_id = ?",
