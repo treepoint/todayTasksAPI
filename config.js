@@ -4,7 +4,7 @@ const mysql = require("mysql");
 const path = require("path");
 
 module.exports = {
-  name: "haveDoneAPI",
+  name: "todayTasksAPI",
   hostname: "http://localhost/api/",
   version: "0.5.1",
   env: process.env.NODE_ENV || "development",
@@ -24,5 +24,5 @@ module.exports = {
     expiresIn: "4320m",
     refreshExpiresIn: "5760m"
   },
-  uploadFilesDirectory: path.join(__dirname, "../haveDoneFiles/files")
+  uploadFilesDirectory: path.join(__dirname, "../todayTasksFiles/files")
 };

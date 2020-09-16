@@ -6,12 +6,12 @@ const users = require("./modules/users.js"),
   taskLog = require("./modules/taskLog.js"),
   auth = require("./modules/auth.js"),
   statistics = require("./modules/statistics.js");
-userSettings = require("./modules/userSettings.js");
+  userSettings = require("./modules/userSettings.js");
 
 //Служебные модули
 const utils = require("./modules/utils.js"),
   startServer = require("./modules/startServer.js"),
-  config = require("./config"),
+  config = require("./config.js"),
   server = startServer();
 
 /*
