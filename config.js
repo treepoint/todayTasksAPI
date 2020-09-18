@@ -6,7 +6,7 @@ const path = require("path");
 module.exports = {
   name: "todayTasksAPI",
   hostname: "http://localhost/api/",
-  version: "0.5.1",
+  version: "0.5.2",
   env: process.env.NODE_ENV || "development",
   port: process.env.PORT || 5000,
   db: {
@@ -22,7 +22,7 @@ module.exports = {
     secret: "&@$!changeme!$@&",
     refreshSecret: "&@$!changememe!$@&",
     expiresIn: "4320m",
-    refreshExpiresIn: "5760m"
+    refreshExpiresIn: "12960m"
   },
   uploadFilesDirectory: path.join(__dirname, "../todayTasksFiles/files")
 };
