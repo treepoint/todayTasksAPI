@@ -1,12 +1,12 @@
 "use strict";
 
-const mysql = require("mysql");
+const mysql = require("mysql2");
 const path = require("path");
 
 module.exports = {
   name: "todayTasksAPI",
   hostname: "http://localhost/api/",
-  version: "0.5.2",
+  version: "0.5.3",
   env: process.env.NODE_ENV || "development",
   port: process.env.PORT || 5000,
   db: {

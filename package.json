@@ -1,8 +1,8 @@
 {
-  "name": "nodejs-restapi",
-  "version": "1.0.0",
+  "name": "todayTasksAPI",
+  "version": "0.5.3",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -13,7 +13,7 @@
     "formidable": "^1.2.2",
     "jsonwebtoken": "^8.5.1",
     "minimist": "^1.2.5",
-    "mysql": "^2.18.1",
+    "mysql2": "^2.2.1",
     "randomstring": "^1.1.5",
     "restify": "^8.5.1",
     "restify-jwt-community": "^1.1.2"
