@@ -1,5 +1,7 @@
 const config = require("../config");
 const utils = require("./utils.js");
+const categories = require("./categories");
+const tasks = require("./tasks");
 
 var connection = config.db.get;
 
@@ -8,7 +10,7 @@ var getByEmail = (req, callback) => {
   connection.query(
     "select * from users where `email`=?",
     [req.body.email],
-    function(error, results) {
+    function (error, results) {
       if (error) throw error;
       try {
         callback(results[0]);
@@ -23,10 +25,10 @@ var getByEmail = (req, callback) => {
 var getByEmailPassword = (req, callback) => {
   connection.query(
     "select u.id, u.email, u.password, r.name role" +
-      " from users u, roles r " +
-      " where u.role_id = r.id and u.email=? and u.password=?",
+    " from users u, roles r " +
+    " where u.role_id = r.id and u.email=? and u.password=?",
     [req.body.email, req.body.password],
-    function(error, results) {
+    function (error, results) {
       if (error) throw error;
       try {
         callback(results[0]);
@@ -43,10 +45,10 @@ var getById = (req, res) => {
 
   connection.query(
     "select u.id, u.email, u.password, u.role_id, r.name role" +
-      " from users u, roles r " +
-      " where u.role_id = r.id and u.id=?",
+    " from users u, roles r " +
+    " where u.role_id = r.id and u.id=?",
     [id],
-    function(error, results) {
+    function (error, results) {
       utils.sendResultOrCode(error, results, res, 404);
     }
   );
@@ -56,9 +58,9 @@ var getById = (req, res) => {
 var getAll = (req, res) => {
   connection.query(
     "select u.id, u.email, u.role_id, r.name role" +
-      " from users u, roles r" +
-      " where u.role_id = r.id",
-    function(error, results) {
+    " from users u, roles r" +
+    " where u.role_id = r.id",
+    function (error, results) {
       utils.sendResultOrCode(error, utils.arrayToIdObject(results), res, 404);
     }
   );
@@ -69,10 +71,18 @@ var add = (req, res) => {
   //Но сначала проверям, что такого email еще нет в базе
   getByEmail(req, user => {
     if (!user) {
-      connection.query("insert into users set ?", req.body, function(
+      connection.query("insert into users set ?", req.body, function (
         error,
         results
       ) {
+        let user_id = results.insertId;
+
+        //Если успех — создадим так же и первую категорию и первую таску
+        categories.createFirstUserCategory(user_id);
+
+        tasks.createFirstUserTask(user_id);
+
+        // results.insertId — ID свежесозданного пользователя
         utils.sendResultOrCode(error, results, res, 409);
       });
     } else {
@@ -104,11 +114,11 @@ var updateById = (req, res) => {
 var checkDouplicateEmailWhileUpdate = (email, userId, callback) => {
   connection.query(
     "select 1 emailIsExists " +
-      "  from users" +
-      " where email = ?" +
-      "   and id != ?",
+    "  from users" +
+    " where email = ?" +
+    "   and id != ?",
     [email, userId],
-    function(error, results) {
+    function (error, results) {
       callback(utils.arrayToObject(results));
     }
   );
@@ -121,15 +131,15 @@ var updateEmailAndPassword = (req, res) => {
   connection.query(
     "update users set email=?, password=? where id=?",
     [user.email, user.password, userId],
-    function(error, results) {
+    function (error, results) {
       //Если добавили — получим этот объект и вернем уже его
       if (typeof results.insertId === "number") {
         connection.query(
           "select u.id, u.email, u.password, u.role_id, r.name role" +
-            " from users u, roles r " +
-            " where u.role_id = r.id and u.id=?",
+          " from users u, roles r " +
+          " where u.role_id = r.id and u.id=?",
           [userId],
-          function(error, results) {
+          function (error, results) {
             //Если получилось — вернем результат или код ошибки
             utils.sendResultOrCode(
               error,
@@ -155,15 +165,15 @@ var updateEmailAndRole = (req, res) => {
   connection.query(
     "update users set email=?, role_id=? Where id=?",
     [user.email, user.role_id, userId],
-    function(error, results) {
+    function (error, results) {
       //Если добавили — получим этот объект и вернем уже его
       if (typeof results.insertId === "number") {
         connection.query(
           "select u.id, u.email, u.password, u.role_id, r.name role" +
-            " from users u, roles r " +
-            " where u.role_id = r.id and u.id=?",
+          " from users u, roles r " +
+          " where u.role_id = r.id and u.id=?",
           [user.id],
-          function(error, results) {
+          function (error, results) {
             //Если получилось — вернем результат или код ошибки
             utils.sendResultOrCode(
               error,
@@ -186,7 +196,7 @@ var updateEmailAndRole = (req, res) => {
 var deleteById = (req, res) => {
   let userId = req.params.id;
 
-  connection.query("delete from users where id=?", [userId], function(
+  connection.query("delete from users where id=?", [userId], function (
     error,
     results
   ) {

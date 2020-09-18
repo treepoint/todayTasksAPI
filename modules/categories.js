@@ -1,5 +1,6 @@
 const tokens = require("./tokens.js");
 const utils = require("./utils.js");
+const newUserData = require("./newUserData");
 const config = require("../config");
 
 var connection = config.db.get;
@@ -31,9 +32,9 @@ var getByUser = (req, res) => {
 
   connection.query(
     "  select c.* " +
-      "  from categories c  " +
-      " where (c.close_date is null or exists (select 1 from tasks t where t.category_id = c.id)) " +
-      "   and user_id = ?",
+    "  from categories c  " +
+    " where (c.close_date is null or exists (select 1 from tasks t where t.category_id = c.id)) " +
+    "   and user_id = ?",
     [user.id],
     function (error, results) {
       //Преобразуем стили в объект
@@ -150,8 +151,22 @@ var closeById = (req, res) => {
   );
 };
 
+//Создаем тестовую категорию
+var createFirstUserCategory = (user_id) => {
+  connection.query(
+    "insert into categories set ?",
+    {
+      user_id: user_id,
+      name: newUserData.firstCategoryName,
+      name_style: "{}",
+      description: newUserData.firstCategoryDescription,
+      create_date: utils.getCurrentDate(),
+    })
+}
+
 module.exports.getById = getById;
 module.exports.getByUser = getByUser;
 module.exports.add = add;
 module.exports.updateById = updateById;
 module.exports.closeById = closeById;
+module.exports.createFirstUserCategory = createFirstUserCategory;
