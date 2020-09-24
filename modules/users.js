@@ -1,6 +1,7 @@
 const config = require("../config");
 const utils = require("./utils.js");
 const categories = require("./categories");
+const projects = require("./projects");
 const tasks = require("./tasks");
 
 var connection = config.db.get;
@@ -77,9 +78,11 @@ var add = (req, res) => {
       ) {
         let user_id = results.insertId;
 
-        //Если успех — создадим так же и первую категорию и первую таску
+        //Если успех — создадим так же и первый проект
+        projects.createFirstUserProject(user_id);
+        //Категорию
         categories.createFirstUserCategory(user_id);
-
+        //Задачу
         tasks.createFirstUserTask(user_id);
 
         // results.insertId — ID свежесозданного пользователя

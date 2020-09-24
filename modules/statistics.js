@@ -13,17 +13,18 @@ var getTasksExecutionTimeByPeriod = (req, res) => {
 
   connection.query(
     "select" +
-      " t.name," +
-      " c.name category_name," +
-      " c.name_style category_name_style," +
-      " SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time" +
-      " from task_log tl, tasks t, categories c" +
-      " where tl.task_id = t.id" +
-      "   and t.user_id = ?" +
-      "   and t.category_id = c.id" +
-      "   and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') BETWEEN ? and ?" +
-      "   and tl.execution_start < tl.execution_end" +
-      " group by t.id, t.name ",
+    " t.name," +
+    " c.name category_name," +
+    " c.name_style category_name_style," +
+    " t.project_id," +
+    " SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time" +
+    " from task_log tl, tasks t, categories c" +
+    " where tl.task_id = t.id" +
+    "   and t.user_id = ?" +
+    "   and t.category_id = c.id" +
+    "   and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') BETWEEN ? and ?" +
+    "   and tl.execution_start < tl.execution_end" +
+    " group by t.id, t.name ",
     [user.id, dateFrom, dateTo],
     function (error, results) {
       utils.sendResultOrCode(error, results, res, 404);
@@ -40,16 +41,17 @@ var getCategoriesExecutionTimeByPeriod = (req, res) => {
 
   connection.query(
     "select" +
-      " c.name," +
-      " c.name_style," +
-      " SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time" +
-      " from task_log tl, tasks t, categories c" +
-      " where tl.task_id = t.id" +
-      " and t.user_id = ?" +
-      " and t.category_id = c.id" +
-      " and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') BETWEEN ? and ?" +
-      " and tl.execution_start < tl.execution_end" +
-      " group by c.name",
+    " c.name," +
+    " c.name_style," +
+    " t.project_id," +
+    " SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time" +
+    " from task_log tl, tasks t, categories c" +
+    " where tl.task_id = t.id" +
+    " and t.user_id = ?" +
+    " and t.category_id = c.id" +
+    " and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') BETWEEN ? and ?" +
+    " and tl.execution_start < tl.execution_end" +
+    " group by c.name",
     [user.id, dateFrom, dateTo],
     function (error, results) {
       //Преобразуем стили в объект
@@ -69,19 +71,20 @@ var getCategoriesExecutionTimeForAll = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "select name, name_style, SUM(execution_time) execution_time  from" +
-      " (select c.name name, " +
-      "         c.name_style name_style, " +
-      "         TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end) execution_time" +
-      " from task_log tl," +
-      " tasks t," +
-      " categories c" +
-      " where tl.task_id = t.id" +
-      " and c.id = t.category_id" +
-      " and t.user_id = ?" +
-      " ) t" +
-      " where t.execution_time >= 0" +
-      " group by 1",
+    "select name, name_style, project_id, SUM(execution_time) execution_time from" +
+    " (select c.name name, " +
+    "         c.name_style name_style, " +
+    "         c.project_id project_id, " +
+    "         TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end) execution_time" +
+    " from task_log tl," +
+    " tasks t," +
+    " categories c" +
+    " where tl.task_id = t.id" +
+    " and c.id = t.category_id" +
+    " and t.user_id = ?" +
+    " ) t" +
+    " where t.execution_time >= 0" +
+    " group by 1",
     [user.id],
     function (error, results) {
       //Преобразуем стили в объект
@@ -104,18 +107,19 @@ var getTotalExecutionTimeByPeriod = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "select SUM(execution_time) execution_time from (" +
-      "select" +
-      " SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time" +
-      " from task_log tl, tasks t" +
-      " where tl.task_id = t.id" +
-      "   and t.user_id = ?" +
-      "   and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') BETWEEN ? and ?" +
-      "   and tl.execution_start < tl.execution_end" +
-      " group by t.id, t.name ) t",
+    "select SUM(execution_time) execution_time, project_id from (" +
+    "select" +
+    " SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time, t.project_id" +
+    " from task_log tl, tasks t" +
+    " where tl.task_id = t.id" +
+    "   and t.user_id = ?" +
+    "   and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') BETWEEN ? and ?" +
+    "   and tl.execution_start < tl.execution_end" +
+    " group by t.id, t.name, t.project_id ) t" +
+    " group by project_id;",
     [user.id, dateFrom, dateTo],
     function (error, results) {
-      utils.sendResultOrCode(error, utils.arrayToObject(results), res, 404);
+      utils.sendResultOrCode(error, results, res, 404);
     }
   );
 };
@@ -129,14 +133,14 @@ var getStatisticByDaysForPeriod = (req, res) => {
 
   connection.query(
     "select " +
-      " DATE_FORMAT(tl.execution_start,'%Y-%m-%d') date, SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time " +
-      " from task_log tl, tasks t " +
-      " where tl.task_id = t.id " +
-      "   and t.user_id = ? " +
-      "   and tl.execution_start < tl.execution_end " +
-      "	  and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') BETWEEN ? and ? " +
-      " group by 1 " +
-      " order by 1 ",
+    " DATE_FORMAT(tl.execution_start,'%Y-%m-%d') date, SUM(TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end)) execution_time, t.project_id " +
+    " from task_log tl, tasks t " +
+    " where tl.task_id = t.id " +
+    "   and t.user_id = ? " +
+    "   and tl.execution_start < tl.execution_end " +
+    "	  and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') BETWEEN ? and ? " +
+    " group by date, t.project_id " +
+    " order by date, t.project_id ",
     [user.id, dateFrom, dateTo],
     function (error, results) {
       utils.sendResultOrCode(error, results, res, 404);
@@ -150,13 +154,33 @@ var getActiveTasksCountByCategories = (req, res) => {
 
   connection.query(
     " select c.id, " +
-      " (select count(1)  " +
-      "    from tasks ts " +
-      " where ts.category_id = c.id " +
-      "   and (ts.closed_date is null or DATE_FORMAT(ts.closed_date,'%Y-%m-%d') > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) count " +
-      "  from categories c " +
-      " where c.user_id = ?",
+    " (select count(1)  " +
+    "    from tasks ts " +
+    " where ts.category_id = c.id " +
+    "   and (ts.closed_date is null or DATE_FORMAT(ts.closed_date,'%Y-%m-%d') > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) count " +
+    "  from categories c " +
+    " where c.user_id = ?",
     [user.id],
+    function (error, results) {
+      utils.sendResultOrCode(error, utils.arrayToIdObject(results), res, 404);
+    }
+  );
+};
+
+//Получаем количество активных задач в разрезе проектов
+var getActiveTasksCountByProjects = (req, res) => {
+  let user = tokens.getUserFromHeaders(req);
+
+  connection.query(
+    " select p.id, " +
+    " (select count(1)  " +
+    "    from tasks ts " +
+    " where ts.project_id = p.id " +
+    "   and ts.user_id = ?" +
+    "   and (ts.closed_date is null or DATE_FORMAT(ts.closed_date,'%Y-%m-%d') > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) count " +
+    "  from projects p " +
+    " where p.user_id = ?",
+    [user.id, user.id],
     function (error, results) {
       utils.sendResultOrCode(error, utils.arrayToIdObject(results), res, 404);
     }
@@ -169,3 +193,4 @@ module.exports.getCategoriesExecutionTimeByPeriod = getCategoriesExecutionTimeBy
 module.exports.getTotalExecutionTimeByPeriod = getTotalExecutionTimeByPeriod;
 module.exports.getCategoriesExecutionTimeForAll = getCategoriesExecutionTimeForAll;
 module.exports.getActiveTasksCountByCategories = getActiveTasksCountByCategories;
+module.exports.getActiveTasksCountByProjects = getActiveTasksCountByProjects;
