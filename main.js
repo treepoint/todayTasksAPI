@@ -2,11 +2,12 @@
 const users = require("./modules/users.js"),
   userRoles = require("./modules/userRoles.js"),
   categories = require("./modules/categories.js"),
+  projects = require("./modules/projects.js"),
   tasks = require("./modules/tasks.js"),
   taskLog = require("./modules/taskLog.js"),
   auth = require("./modules/auth.js"),
   statistics = require("./modules/statistics.js");
-  userSettings = require("./modules/userSettings.js");
+userSettings = require("./modules/userSettings.js");
 
 //Служебные модули
 const utils = require("./modules/utils.js"),
@@ -98,6 +99,31 @@ server.post("/api/categories", function (req, res) {
 server.put("/api/categories/:id", function (req, res) {
   categories.updateById(req, res);
 });
+
+/*
+ * Проекты
+ */
+
+//Получаем проект по ID
+server.get("/api/projects/:id", function (req, res) {
+  projects.getById(req, res);
+});
+
+//Получаем все проекты пользователя
+server.get("/api/projects", function (req, res) {
+  projects.getByUser(req, res);
+});
+
+//Добавляем проект для пользователя
+server.post("/api/projects", function (req, res) {
+  projects.add(req, res);
+});
+
+//Обновляем проект по ID
+server.put("/api/projects/:id", function (req, res) {
+  projects.updateById(req, res);
+});
+
 
 /*
  * Задачи
@@ -193,6 +219,11 @@ server.get("/api/statistic/days/period/:dateFrom/:dateTo", function (req, res) {
 //Получаем количество активных задач в разрезе категорий
 server.get("/api/statistic/active_tasks/by_categories", function (req, res) {
   statistics.getActiveTasksCountByCategories(req, res);
+});
+
+//Получаем количество активных задач в разрезе проектов
+server.get("/api/statistic/active_tasks/by_projects", function (req, res) {
+  statistics.getActiveTasksCountByProjects(req, res);
 });
 
 /*

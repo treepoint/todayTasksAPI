@@ -24,7 +24,7 @@ var getAll = (req, res) => {
               const userSettings = {
                 id: results.insertId,
                 user_id: user.id,
-                tasks_wallpaper: null
+                wallpaper: null
               };
               utils.sendResultOrCode(error, userSettings, res, 400);
             }
@@ -42,15 +42,16 @@ var getAll = (req, res) => {
 var updateById = (req, res) => {
   const id = req.params.id;
   const userSettings = req.body;
+
   const user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "update user_settings set wallpaper=? where id=? and user_id = ?",
-    [userSettings.wallpaper, id, user.id],
+    "update user_settings set wallpaper=?, project_id = ? where id=? and user_id = ?",
+    [userSettings.wallpaper, userSettings.project_id, id, user.id],
     function (error, results) {
-      //Если обновили — получим этот объект и вернем уже его
+      //Если обновили — вернем объект обратно
       if (typeof results.affectedRows === "number") {
-        utils.sendResultOrCode(error, results, res, 400);
+        utils.sendResultOrCode(error, userSettings, res, 400);
       }
     }
   );
