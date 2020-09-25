@@ -1,7 +1,10 @@
 const config = require("../config");
+const utils = require("./utils.js");
 const jwt = require("jsonwebtoken");
 
-var createToken = function(user, secret, expiresIn) {
+var connection = config.db.get;
+
+var createToken = function (user, secret, expiresIn) {
   //Генерируем токен
   let value = jwt.sign(
     {
@@ -25,7 +28,7 @@ var createToken = function(user, secret, expiresIn) {
 };
 
 //Создаем токенs
-var createTokens = function(user, callback) {
+var createTokens = function (user, callback) {
   let token = createToken(user, config.jwt.secret, config.jwt.expiresIn);
 
   let refreshToken = createToken(
@@ -38,25 +41,35 @@ var createTokens = function(user, callback) {
 };
 
 //Обновляем токен по refresh token
-var refreshTokens = function(refreshTokenValue, callback) {
+var refreshTokens = function (refreshTokenValue, callback) {
   //Чекаем refresh token
   isValidRefreshToken(refreshTokenValue, isValid => {
     if (isValid) {
-      //Если нормально — получим пользователя по токену
+      //Если нормально — получим пользователя по токену, точнее из него нам нужен только ID
       let user = getUserFromToken(refreshTokenValue);
 
-      //Если есть пользователь — создаем токены заново и возвращаем
-      createTokens(user, (token, newRefreshToken) => {
-        callback(token, newRefreshToken, user);
-      });
+      //Получаем пользователя по ID, создаем токен и возвращаем
+      connection.query(
+        "select u.* " +
+        " from users u " +
+        " where u.id=?",
+        [user.id],
+        function (error, user) {
+          //Если есть пользователь — создаем токены заново и возвращаем
+          createTokens(utils.arrayToObject(user), (token, newRefreshToken) => {
+            callback(token, newRefreshToken, utils.arrayToObject(user));
+          });
+        }
+      );
     }
   });
 };
 
+
 //Проверяем валидность refresh token
-var isValidRefreshToken = function(refreshToken, callback) {
+var isValidRefreshToken = function (refreshToken, callback) {
   if (refreshToken) {
-    jwt.verify(refreshToken, config.jwt.refreshSecret, function(err, decoded) {
+    jwt.verify(refreshToken, config.jwt.refreshSecret, function (err, decoded) {
       if (err) {
         callback(false);
       } else {
