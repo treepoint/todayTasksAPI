@@ -65,7 +65,6 @@ var refreshTokens = function (refreshTokenValue, callback) {
   });
 };
 
-
 //Проверяем валидность refresh token
 var isValidRefreshToken = function (refreshToken, callback) {
   if (refreshToken) {
