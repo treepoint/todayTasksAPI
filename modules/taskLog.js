@@ -11,18 +11,19 @@ var getByDate = (req, res) => {
 
   connection.query(
     "select " +
-      " tl.id, " +
-      " tl.task_id, " +
-      " t.name task_name," +
-      " tl.comment," +
-      "? for_date, " +
-      " DATE_FORMAT(tl.execution_start,'%H:%i') execution_start, " +
-      " DATE_FORMAT(tl.execution_end,'%H:%i') execution_end," +
-      " TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end) execution_time" +
-      " from task_log tl, tasks t where tl.task_id = t.id and t.user_id =? and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') = ? " +
-      " order by tl.id desc",
+    " tl.id, " +
+    " tl.task_id, " +
+    " t.name task_name," +
+    " t.project_id project_id," +
+    " tl.comment," +
+    "? for_date, " +
+    " DATE_FORMAT(tl.execution_start,'%H:%i') execution_start, " +
+    " DATE_FORMAT(tl.execution_end,'%H:%i') execution_end," +
+    " TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end) execution_time" +
+    " from task_log tl, tasks t where tl.task_id = t.id and t.user_id =? and DATE_FORMAT(tl.execution_start,'%Y-%m-%d') = ? " +
+    " order by tl.id desc",
     [date, user.id, date],
-    function(error, results) {
+    function (error, results) {
       //Немного конвертируем время. Если время исполнения меньше 0 — проставим 0
       let result = results.map(item => {
         if (item.execution_time < 0) {
@@ -41,7 +42,7 @@ var add = (req, res) => {
   let taskLog = req.body;
   let user = tokens.getUserFromHeaders(req);
 
-  connection.query("insert into task_log set ?", taskLog, function(
+  connection.query("insert into task_log set ?", taskLog, function (
     error,
     results
   ) {
@@ -49,18 +50,19 @@ var add = (req, res) => {
     if (typeof results.insertId === "number") {
       connection.query(
         "select " +
-          " tl.id, " +
-          " tl.task_id, " +
-          " t.name task_name," +
-          " tl.comment," +
-          "? for_date, " +
-          " DATE_FORMAT(tl.execution_start,'%H:%i') execution_start, " +
-          " DATE_FORMAT(tl.execution_end,'%H:%i') execution_end," +
-          " TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end) execution_time" +
-          " from task_log tl, tasks t where tl.task_id = t.id and tl.id =? and t.user_id =? " +
-          " order by tl.id desc",
+        " tl.id, " +
+        " tl.task_id, " +
+        " t.name task_name," +
+        " t.project_id project_id," +
+        " tl.comment," +
+        "? for_date, " +
+        " DATE_FORMAT(tl.execution_start,'%H:%i') execution_start, " +
+        " DATE_FORMAT(tl.execution_end,'%H:%i') execution_end," +
+        " TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end) execution_time" +
+        " from task_log tl, tasks t where tl.task_id = t.id and tl.id =? and t.user_id =? " +
+        " order by tl.id desc",
         [taskLog.execution_end, results.insertId, user.id],
-        function(error, results) {
+        function (error, results) {
           //Немного конвертируем время. Если время исполнения меньше 0 — проставим 0
           let result = results.map(item => {
             if (item.execution_time < 0) {
@@ -93,12 +95,12 @@ var updateById = (req, res) => {
 
   connection.query(
     "update task_log " +
-      " set  " +
-      " task_id=?,  " +
-      " comment=?,  " +
-      " execution_start=CONCAT(DATE(execution_start),  ?),  " +
-      " execution_end=CONCAT(DATE(execution_end),  ?)  " +
-      " where id=?",
+    " set  " +
+    " task_id=?,  " +
+    " comment=?,  " +
+    " execution_start=CONCAT(DATE(execution_start),  ?),  " +
+    " execution_end=CONCAT(DATE(execution_end),  ?)  " +
+    " where id=?",
     [
       taskLog.task_id,
       taskLog.comment,
@@ -106,22 +108,23 @@ var updateById = (req, res) => {
       " " + taskLog.execution_end,
       taskLog.id
     ],
-    function(error, results) {
+    function (error, results) {
       //Если обновили — получим этот объект и вернем уже его
       if (typeof results.affectedRows === "number") {
         connection.query(
           "select " +
-            " tl.id, " +
-            " tl.task_id, " +
-            " t.name task_name," +
-            " tl.comment," +
-            " DATE_FORMAT(tl.execution_start,'%H:%i') execution_start, " +
-            " DATE_FORMAT(tl.execution_end,'%H:%i') execution_end," +
-            " TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end) execution_time" +
-            " from task_log tl, tasks t where tl.task_id = t.id and tl.id =? and t.user_id =? " +
-            " order by tl.id desc",
+          " tl.id, " +
+          " tl.task_id, " +
+          " t.name task_name," +
+          " t.project_id project_id," +
+          " tl.comment," +
+          " DATE_FORMAT(tl.execution_start,'%H:%i') execution_start, " +
+          " DATE_FORMAT(tl.execution_end,'%H:%i') execution_end," +
+          " TIMESTAMPDIFF(MINUTE, tl.execution_start, tl.execution_end) execution_time" +
+          " from task_log tl, tasks t where tl.task_id = t.id and tl.id =? and t.user_id =? " +
+          " order by tl.id desc",
           [taskLog.id, user.id],
-          function(error, results) {
+          function (error, results) {
             //Если получилось — вернем результат или код ошибки
             utils.sendResultOrCode(
               error,
@@ -140,7 +143,7 @@ var updateById = (req, res) => {
 var deleteById = (req, res) => {
   let id = req.params.id;
 
-  connection.query("delete from task_log where id=?", [id], function(
+  connection.query("delete from task_log where id=?", [id], function (
     error,
     results
   ) {
@@ -151,7 +154,7 @@ var deleteById = (req, res) => {
 //Удаляем все записи в логе по задаче
 //Используется только внутри API, посему здесь без req и res
 var deleteByTaskId = (taskId, callback) => {
-  connection.query("delete from task_log where task_id=?", [taskId], function(
+  connection.query("delete from task_log where task_id=?", [taskId], function (
     error
   ) {
     if (error) throw error;

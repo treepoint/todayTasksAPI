@@ -1,5 +1,5 @@
 //Отправляем результат или код
-var sendResultOrCode = function(error, result, response, code) {
+var sendResultOrCode = function (error, result, response, code) {
   if (error) throw error;
   try {
     response.end(JSON.stringify(result));
@@ -9,8 +9,24 @@ var sendResultOrCode = function(error, result, response, code) {
   }
 };
 
+//Отформатировать дату
+var formatDate = function (date) {
+
+  if (!date) {
+    return date;
+  }
+
+  var formatDate = new Date(date);
+  var dd = String(formatDate.getDate()).padStart(2, "0");
+  var mm = String(formatDate.getMonth() + 1).padStart(2, "0");
+  var yyyy = formatDate.getFullYear();
+
+  return yyyy + "-" + mm + "-" + dd;
+};
+
+
 //Получить текущую дату
-var getCurrentDate = function() {
+var getCurrentDate = function () {
   var formatDate = new Date();
   var dd = String(formatDate.getDate()).padStart(2, "0");
   var mm = String(formatDate.getMonth() + 1).padStart(2, "0");
@@ -20,7 +36,7 @@ var getCurrentDate = function() {
 };
 
 //Получить текущую дату и время
-var getCurrentDateTime = function() {
+var getCurrentDateTime = function () {
   var date = new Date();
 
   var dd = String(date.getDate()).padStart(2, "0");
@@ -34,7 +50,7 @@ var getCurrentDateTime = function() {
 };
 
 //Преобразовать массив в объект, где ID — название объекта
-var arrayToIdObject = function(array) {
+var arrayToIdObject = function (array) {
   let object = {};
 
   array.forEach(item => {
@@ -46,7 +62,7 @@ var arrayToIdObject = function(array) {
 };
 
 //Преобразовать массив в объект
-var arrayToObject = function(array) {
+var arrayToObject = function (array) {
   let object = {};
 
   array.forEach(item => {
@@ -60,5 +76,6 @@ var arrayToObject = function(array) {
 module.exports.arrayToObject = arrayToObject;
 module.exports.arrayToIdObject = arrayToIdObject;
 module.exports.sendResultOrCode = sendResultOrCode;
+module.exports.formatDate = formatDate;
 module.exports.getCurrentDate = getCurrentDate;
 module.exports.getCurrentDateTime = getCurrentDateTime;

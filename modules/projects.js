@@ -5,13 +5,13 @@ const config = require("../config");
 
 var connection = config.db.get;
 
-//Получаем категорию по ID
+//Получаем проект по ID
 var getById = (req, res) => {
   let id = req.params.id;
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "select * from categories where id=? and user_id =?",
+    "select * from projects where id=? and user_id =?",
     [id, user.id],
     function (error, results) {
       //Преобразуем стили в объект
@@ -26,14 +26,14 @@ var getById = (req, res) => {
   );
 };
 
-//Получаем все категории пользователя
+//Получаем все проекты пользователя
 var getByUser = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
     "  select c.* " +
-    "  from categories c  " +
-    " where (c.close_date is null or exists (select 1 from tasks t where t.category_id = c.id)) " +
+    "  from projects c  " +
+    " where (c.close_date is null or exists (select 1 from tasks t where t.project_id = c.id)) " +
     "   and user_id = ?",
     [user.id],
     function (error, results) {
@@ -49,26 +49,25 @@ var getByUser = (req, res) => {
   );
 };
 
-//Добавляем категорию
+//Добавляем проект
 var add = (req, res) => {
-  let category = req.body;
+  let project = req.body;
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "insert into categories set ?",
+    "insert into projects set ?",
     {
       user_id: user.id,
-      project_id: category.project_id,
-      name: category.name,
-      name_style: category.name_style,
-      description: category.description,
+      name: project.name,
+      name_style: project.name_style,
+      description: project.description,
       create_date: utils.getCurrentDate(),
     },
     function (error, results) {
       //Если добавили — получим этот объект и вернем уже его
       if (typeof results.insertId === "number") {
         connection.query(
-          "select * from categories where id=? and user_id =?",
+          "select * from projects where id=? and user_id =?",
           [results.insertId, user.id],
           function (error, results) {
             //Преобразуем стили в объект
@@ -95,19 +94,18 @@ var add = (req, res) => {
   );
 };
 
-//Обновляем категорию по ID
+//Обновляем проект по ID
 var updateById = (req, res) => {
   let id = req.params.id;
-  let category = req.body;
-
+  let project = req.body;
   let user = tokens.getUserFromHeaders(req);
   connection.query(
-    "update categories set name=?, name_style = ?, description=?, close_date=? Where id=? and user_id =?",
+    "update projects set name=?, name_style = ?, description=?, close_date=? Where id=? and user_id =?",
     [
-      category.name,
-      JSON.stringify(category.name_style),
-      category.description,
-      utils.formatDate(category.close_date),
+      project.name,
+      JSON.stringify(project.name_style),
+      project.description,
+      utils.formatDate(project.close_date),
       id,
       user.id,
     ],
@@ -115,7 +113,7 @@ var updateById = (req, res) => {
       //Если обновили — получим этот объект и вернем уже его
       if (typeof results.affectedRows === "number") {
         connection.query(
-          "select * from categories where id=? and user_id =?",
+          "select * from projects where id=? and user_id =?",
           [id, user.id],
           function (error, results) {
             //Преобразуем стили в объект
@@ -138,36 +136,21 @@ var updateById = (req, res) => {
   );
 };
 
-//Создаем тестовую категорию
-var createFirstUserCategory = (user_id) => {
-
-  //Получим ID первого открытого проекта пользователя
+//Создаем тестовый проект
+var createFirstUserProject = (user_id) => {
   connection.query(
-    "  select c.id " +
-    "  from projects c  " +
-    " where (c.close_date is null or exists (select 1 from tasks t where t.category_id = c.id)) " +
-    "   and user_id = ?" +
-    " limit 1",
-    [user_id],
-    function (error, result) {
-
-      let project_id = result[0].id;
-
-      connection.query(
-        "insert into categories set ?",
-        {
-          user_id: user_id,
-          project_id: project_id,
-          name: newUserData.firstCategoryName,
-          name_style: "{}",
-          description: newUserData.firstCategoryDescription,
-          create_date: utils.getCurrentDate(),
-        })
-    });
+    "insert into projects set ?",
+    {
+      user_id: user_id,
+      name: newUserData.firstProjectName,
+      name_style: "{}",
+      description: newUserData.firstProjectDescription,
+      create_date: utils.getCurrentDate(),
+    })
 }
 
 module.exports.getById = getById;
 module.exports.getByUser = getByUser;
 module.exports.add = add;
 module.exports.updateById = updateById;
-module.exports.createFirstUserCategory = createFirstUserCategory;
+module.exports.createFirstUserProject = createFirstUserProject;

@@ -19,6 +19,7 @@ var getById = (req, res) => {
     " t.description, " +
     " c.name category_name, " +
     " t.category_id," +
+    " t.project_id," +
     " t.on_fire, " +
     " t.frozen, " +
     " DATE_FORMAT(t.closed_date,'%Y-%m-%d') closed_date," +
@@ -46,6 +47,7 @@ var getByDate = (req, res) => {
     "  t.description, " +
     "  c.name category_name, " +
     "  t.category_id, " +
+    "  t.project_id," +
     "  t.on_fire," +
     "  t.frozen," +
     "  DATE_FORMAT(t.closed_date,'%Y-%m-%d') closed_date," +
@@ -104,6 +106,7 @@ var add = (req, res) => {
         " t.description, " +
         " c.name category_name, " +
         " t.category_id," +
+        " t.project_id," +
         " t.on_fire, " +
         " t.frozen, " +
         " DATE_FORMAT(t.closed_date,'%Y-%m-%d') closed_date," +
@@ -172,6 +175,7 @@ var updateById = (req, res) => {
           " t.description, " +
           " c.name category_name, " +
           " t.category_id," +
+          " t.project_id," +
           " t.on_fire, " +
           " t.frozen, " +
           " DATE_FORMAT(t.closed_date,'%Y-%m-%d') closed_date," +
