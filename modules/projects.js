@@ -11,8 +11,18 @@ var getById = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "select * from projects where id=? and user_id =?",
-    [id, user.id],
+    "select p.*, " +
+    "       (select count(1) " +
+    "          from tasks t " +
+    "         where t.project_id = p.id " +
+    "           and t.closed_date is null " +
+    "           and (t.moved_date <= DATE_FORMAT(CURDATE(),'%Y-%m-%d') or t.moved_date is null) " +
+    "           and user_id = ?) " +
+    "        tasks_count " +
+    " from projects p " +
+    "where id=? " +
+    " and user_id =? ",
+    [user.id, id, user.id],
     function (error, results) {
       //Преобразуем стили в объект
       let result = results.map((item) => {
@@ -31,11 +41,18 @@ var getByUser = (req, res) => {
   let user = tokens.getUserFromHeaders(req);
 
   connection.query(
-    "  select c.* " +
-    "  from projects c  " +
-    " where (c.close_date is null or exists (select 1 from tasks t where t.project_id = c.id)) " +
-    "   and user_id = ?",
-    [user.id],
+    "select p.*, " +
+    "       (select count(1)  " +
+    "          from tasks t  " +
+    "         where t.project_id = p.id " +
+    "           and t.closed_date is null " +
+    "           and (t.moved_date <= DATE_FORMAT(CURDATE(),'%Y-%m-%d') or t.moved_date is null) " +
+    "           and user_id = ?) " +
+    "         tasks_count " +
+    " from projects p " +
+    "where (p.close_date is null or exists (select 1 from tasks t where t.project_id = p.id)) " +
+    "  and user_id = ? ",
+    [user.id, user.id],
     function (error, results) {
       //Преобразуем стили в объект
       let result = results.map((item) => {
@@ -67,8 +84,18 @@ var add = (req, res) => {
       //Если добавили — получим этот объект и вернем уже его
       if (typeof results.insertId === "number") {
         connection.query(
-          "select * from projects where id=? and user_id =?",
-          [results.insertId, user.id],
+          "select p.*, " +
+          "       (select count(1) " +
+          "          from tasks t " +
+          "         where t.project_id = p.id " +
+          "           and t.closed_date is null " +
+          "           and (t.moved_date <= DATE_FORMAT(CURDATE(),'%Y-%m-%d') or t.moved_date is null) " +
+          "           and user_id = ?) " +
+          "        tasks_count " +
+          " from projects p " +
+          "where id=? " +
+          " and user_id =? ",
+          [user.id, results.insertId, user.id],
           function (error, results) {
             //Преобразуем стили в объект
             let result = results.map((item) => {
@@ -113,8 +140,18 @@ var updateById = (req, res) => {
       //Если обновили — получим этот объект и вернем уже его
       if (typeof results.affectedRows === "number") {
         connection.query(
-          "select * from projects where id=? and user_id =?",
-          [id, user.id],
+          "select p.*, " +
+          "       (select count(1) " +
+          "          from tasks t " +
+          "         where t.project_id = p.id " +
+          "           and t.closed_date is null " +
+          "           and (t.moved_date <= DATE_FORMAT(CURDATE(),'%Y-%m-%d') or t.moved_date is null) " +
+          "           and user_id = ?) " +
+          "        tasks_count " +
+          " from projects p " +
+          "where id=? " +
+          " and user_id =? ",
+          [user.id, id, user.id],
           function (error, results) {
             //Преобразуем стили в объект
             let result = results.map((item) => {

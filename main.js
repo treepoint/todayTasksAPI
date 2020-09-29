@@ -221,11 +221,6 @@ server.get("/api/statistic/active_tasks/by_categories", function (req, res) {
   statistics.getActiveTasksCountByCategories(req, res);
 });
 
-//Получаем количество активных задач в разрезе проектов
-server.get("/api/statistic/active_tasks/by_projects", function (req, res) {
-  statistics.getActiveTasksCountByProjects(req, res);
-});
-
 /*
  * Пользовательские настройки
  */

@@ -167,30 +167,9 @@ var getActiveTasksCountByCategories = (req, res) => {
   );
 };
 
-//Получаем количество активных задач в разрезе проектов
-var getActiveTasksCountByProjects = (req, res) => {
-  let user = tokens.getUserFromHeaders(req);
-
-  connection.query(
-    " select p.id, " +
-    " (select count(1)  " +
-    "    from tasks ts " +
-    " where ts.project_id = p.id " +
-    "   and ts.user_id = ?" +
-    "   and (ts.closed_date is null or DATE_FORMAT(ts.closed_date,'%Y-%m-%d') > DATE_FORMAT(CURDATE(),'%Y-%m-%d'))) count " +
-    "  from projects p " +
-    " where p.user_id = ?",
-    [user.id, user.id],
-    function (error, results) {
-      utils.sendResultOrCode(error, utils.arrayToIdObject(results), res, 404);
-    }
-  );
-};
-
 module.exports.getStatisticByDaysForPeriod = getStatisticByDaysForPeriod;
 module.exports.getTasksExecutionTimeByPeriod = getTasksExecutionTimeByPeriod;
 module.exports.getCategoriesExecutionTimeByPeriod = getCategoriesExecutionTimeByPeriod;
 module.exports.getTotalExecutionTimeByPeriod = getTotalExecutionTimeByPeriod;
 module.exports.getCategoriesExecutionTimeForAll = getCategoriesExecutionTimeForAll;
 module.exports.getActiveTasksCountByCategories = getActiveTasksCountByCategories;
-module.exports.getActiveTasksCountByProjects = getActiveTasksCountByProjects;
