@@ -21,7 +21,7 @@ const utils = require("./modules/utils.js"),
 
 //Получаем версию API
 server.get("/api/version", function (req, res) {
-  utils.sendResultOrCode(config.version, 404, res);
+  utils.sendResultOrCode(undefined, config.version, res, 404);
 });
 
 /*

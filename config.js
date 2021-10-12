@@ -6,7 +6,7 @@ const path = require("path");
 module.exports = {
   name: "todayTasksAPI",
   hostname: "http://localhost/api/",
-  version: "0.5.4",
+  version: "0.5.5",
   env: process.env.NODE_ENV || "development",
   port: process.env.PORT || 5000,
   db: {
